@@ -17,6 +17,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Alert, MicroLoading } from "../../microInteraction";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import postAuthRedirect from "../../utils/postAuthRedirect";
 
 const Login = () => {
   const router = useRouter();
@@ -40,9 +41,11 @@ const Login = () => {
     }
   }, [alert]);
 
+  // `replace`, not `push`: App.jsx redirected with <Navigate replace />, so the
+  // login page must not sit in the history stack behind the destination.
   useEffect(() => {
     if (shouldNavigate) {
-      router.push(navigatePath);
+      router.replace(navigatePath);
       setShouldNavigate(false);
     }
   }, [shouldNavigate, navigatePath, router]);
@@ -81,7 +84,7 @@ const Login = () => {
           duration: 2800,
         });
 
-        setNavigatePath(sessionStorage.getItem("prevPage") || "/");
+        setNavigatePath(postAuthRedirect());
 
         setTimeout(() => {
           localStorage.setItem("token", response.data.token);
@@ -104,6 +107,11 @@ const Login = () => {
             response.data.token,
             9600000
           );
+          // App.jsx re-rendered /Login as <LoginRedirect /> the moment
+          // isLoggedIn flipped. App Router routes are files and nothing watches
+          // that flag, so the navigation this component was already wired for
+          // has to be triggered explicitly.
+          setShouldNavigate(true);
         }, 800);
         // console.log(authCtx);
 

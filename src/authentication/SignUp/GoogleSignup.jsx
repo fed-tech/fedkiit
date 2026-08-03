@@ -12,6 +12,7 @@ import users from "../../data/user.json";
 import { Alert, MicroLoading } from "../../microInteraction";
 import { api } from "../../services";
 import { useRouter } from "next/navigation";
+import postAuthRedirect from "../../utils/postAuthRedirect";
 
 export default function GoogleSignup({ setAlert }) {
   // const [alert, setAlert] = useState(null);
@@ -35,9 +36,10 @@ export default function GoogleSignup({ setAlert }) {
 
 
 
+  // `replace`, not `push`: App.jsx redirected with <Navigate replace />.
   useEffect(() => {
     if (shouldNavigate) {
-      router.push(navigatePath);
+      router.replace(navigatePath);
       setShouldNavigate(false); // Reset state after navigation
     }
   }, [shouldNavigate, navigatePath, router]);
@@ -64,8 +66,10 @@ export default function GoogleSignup({ setAlert }) {
             position: "bottom-right",
             duration: 3000,
           });
-          setNavigatePath("/");
           sessionStorage.removeItem("prevPage"); // Clean up
+          // Order matters: App.jsx cleared prevPage here and only then rendered
+          // <LoginRedirect />, which therefore fell through to /profile.
+          setNavigatePath(postAuthRedirect());
 
           setTimeout(() => {
             localStorage.setItem("token",response.data.token);
@@ -88,6 +92,10 @@ export default function GoogleSignup({ setAlert }) {
               response.data.token,
               9600000
             );
+            // App.jsx re-rendered /SignUp as <LoginRedirect /> once isLoggedIn
+            // flipped; nothing watches that flag under the App Router, so the
+            // navigation this component was already wired for is triggered here.
+            setShouldNavigate(true);
           }, 800);
         } else {
           // Handle unexpected response status
