@@ -15,6 +15,7 @@ const TeamCard = ({
   customStyles = {},
   onUpdate,
   onRemove,
+  size = "default",
 }) => {
   const [showMore, setShowMore] = useState(false);
   const [contentLoaded, setContentLoaded] = useState(false);
@@ -53,16 +54,11 @@ const TeamCard = ({
     }
   };
 
-  const isExtraDataEmpty = () => {
-    return (
-      !extraData?.designation &&
-      !extraData?.linkedin &&
-      !extraData?.github &&
-      !extraData.know
-    );
-  };
+  // A "Know More" toggle only makes sense for director-level members that
+  // actually have bio text to show — everyone else gets a static card with
+  // no extra affordance.
+  const hasBio = isDirectorRole && !!extraData?.know;
 
-  
   //for name overflow
 
   const nameRef = useRef(null);
@@ -75,177 +71,139 @@ const TeamCard = ({
   }, [member.name]);
 
   return (
-    <div className={`${styles.teamMember} ${customStyles.teamMember || ""}`}>
+    <div
+      className={`${styles.teamMember} ${
+        size === "featured" ? styles.featured : ""
+      } ${customStyles.teamMember || ""}`}
+    >
       {showSkeleton && <TeamCardSkeleton customStyles={customStyles} />}
       <div
         className={styles.teamMemberInner}
         style={{ display: showSkeleton ? "none" : "block" }}
       >
-        <div
-          className={`${styles.teamMemberFront} ${
-            customStyles.teamMemberFront || ""
-          }`}
-        >
-          <div className={styles.ImgDiv}>
-            {!isImageLoaded && (
-              <Blurhash
-                hash="LEG8_%els7NgM{M{RiNI*0IVog%L"
-                width={"100%"}
-                height={"100%"}
-                resolutionX={32}
-                resolutionY={32}
-                punch={1}
-              />
-            )}
+        <div className={styles.ImgDiv}>
+          {!isImageLoaded && (
+            <Blurhash
+              hash="LEG8_%els7NgM{M{RiNI*0IVog%L"
+              width={"100%"}
+              height={"100%"}
+              resolutionX={32}
+              resolutionY={32}
+              punch={1}
+              className={styles.teamMember_blurhash}
+            />
+          )}
+          {member?.img && (
             <img
-              src={member?.img}
+              src={member.img}
               alt={`Profile of ${member?.name}`}
               className={styles.teamMemberImg}
               onLoad={handleImageLoad}
               style={{ display: isImageLoaded ? "block" : "none" }}
             />
-          </div>
-          <div
-            className={`${styles.teamMemberInfo} ${
-              customStyles.teamMemberInfo || ""
-            }`}
-          >
-            <h4
-              ref={nameRef}
-              className={`${styles.memName} ${isOverflowing ? styles.responsive : ""}`}
-              style={{ color: "#000" }}
-            >
-              {member?.name}
-            </h4>
-          </div>
-        </div>
-        <div
-          className={`${styles.teamMemberBack} ${
-            customStyles.teamMemberBack || ""
-          }`}
-        >
+          )}
+
+          <div className={styles.scrim} aria-hidden="true" />
+
           {!showMore ? (
             <>
-              {extraData.designation && (
-                <h5
-                  className={`${
-                    customStyles.teamMemberBackh5 || ""
+              <div className={styles.overlayInfo}>
+                {extraData.designation && (
+                  <p className={styles.role}>{extraData.designation}</p>
+                )}
+                <h4
+                  ref={nameRef}
+                  className={`${styles.memName} ${
+                    isOverflowing ? styles.responsive : ""
                   }`}
-                  style={{ color: "#fff" }}
                 >
-                  {extraData.designation}
-                </h5>
-              )}
-              <div
-                className={`${styles.socialLinks} ${
-                  customStyles.socialLinks || ""
-                }`}
-              >
-                {extraData?.linkedin && (
-                  <a
-                    href={handleLink(extraData?.linkedin)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`${
-                      customStyles.socialLinksa || ""
-                    }`}
-                  >
-                    <FaLinkedin />
-                  </a>
-                )}
-                {extraData?.github && (
-                  <a
-                    href={handleLink(extraData?.github)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`${
-                      customStyles.socialLinksa || ""
-                    }`}
-                  >
-                    <FaGithub />
-                  </a>
-                )}
+                  {member?.name}
+                </h4>
               </div>
-              {!isExtraDataEmpty() && isDirectorRole && (
+
+              {(extraData?.linkedin || extraData?.github) && (
+                <div className={styles.socialChips}>
+                  {extraData?.linkedin && (
+                    <a
+                      href={handleLink(extraData?.linkedin)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.chip}
+                      aria-label={`${member?.name} on LinkedIn`}
+                    >
+                      <FaLinkedin />
+                    </a>
+                  )}
+                  {extraData?.github && (
+                    <a
+                      href={handleLink(extraData?.github)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.chip}
+                      aria-label={`${member?.name} on GitHub`}
+                    >
+                      <FaGithub />
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {hasBio && (
                 <button
                   onClick={() => setShowMore(true)}
                   aria-expanded={showMore}
-                  className={`${customStyles.button || ""}`}
+                  className={styles.knowMoreBtn}
                 >
                   Know More
                 </button>
               )}
-              {isExtraDataEmpty() ? (
-                <div
-                  className={`${styles.knowPara} ${
-                    customStyles.knowPara || ""
-                  }`}
-                >
-                  <p>Nothing to show</p>
-                </div>
-              ) : null}
-              {onUpdate && authCtx.user.access === "ADMIN" && (
-                <div
-                  className={`${styles.updatebtn} ${
-                    customStyles.updatebtn || ""
-                  }`}
-                >
-                  <Button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (onUpdate) {
-                        // console.log(member);
-                        authCtx.memberData = member;
-                        onUpdate();
-                      }
-                    }}
-                  >
-                    Update
-                  </Button>
-
-                  <Button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const isConfirmed = window.confirm(
-                        `Do you really want to remove this member "${member?.name}"?`
-                      );
-                      if (isConfirmed && onRemove) {
-                        // console.log(member);
-                        authCtx.memberData = member;
-                        onRemove();
-                      }
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              )}
             </>
           ) : (
-            <div
-              className={`${styles.knowMoreContent} ${
-                customStyles.knowMoreContent || ""
-              }`}
-            >
-              {extraData.know && (
-                <div
-                  className={`${styles.knowPara} ${
-                    customStyles.knowPara || ""
-                  }`}
-                >
-                  <p>{extraData.know}</p>
-                </div>
-              )}
+            <div className={styles.bioOverlay}>
+              <div className={styles.knowPara}>
+                <p>{extraData.know}</p>
+              </div>
               <button
                 onClick={() => setShowMore(false)}
                 aria-expanded={showMore}
-                className={`${customStyles.button || ""}`}
+                className={styles.backBtn}
               >
                 Back
               </button>
             </div>
           )}
         </div>
+
+        {onUpdate && authCtx.user.access === "ADMIN" && (
+          <div className={styles.updatebtn}>
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                if (onUpdate) {
+                  authCtx.memberData = member;
+                  onUpdate();
+                }
+              }}
+            >
+              Update
+            </Button>
+
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                const isConfirmed = window.confirm(
+                  `Do you really want to remove this member "${member?.name}"?`
+                );
+                if (isConfirmed && onRemove) {
+                  authCtx.memberData = member;
+                  onRemove();
+                }
+              }}
+            >
+              Remove
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -263,6 +221,7 @@ TeamCard.propTypes = {
   know: PropTypes.string.isRequired,
   blurhash: PropTypes.string, // Add this line
   customStyles: PropTypes.object,
+  size: PropTypes.oneOf(["default", "featured"]),
   onUpdate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
 };
