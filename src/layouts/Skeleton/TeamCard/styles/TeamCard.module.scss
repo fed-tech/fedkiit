@@ -1,67 +1,139 @@
-.skeleton {
-    position: relative;
-    overflow: hidden;
-    opacity: 0.7;
-    width: 100%;
-    height: 110%;
-    top: -5px;
-  }
-  
-  
-  .skeleton2 {
-    position: relative;
-    overflow: hidden;
-    opacity: 0.7;
-    width: 100%;
-    height: 110%;
-    top: -5px;
-  }
+/*
+  TeamCardSkeleton — SCSS Module
+  ================================
+  All dimensions MUST stay in sync with .teamMember / .ImgDiv in:
+    src/components/TeamCard/styles/TeamCard.module.scss
 
-  .skeletonBack{
-    width: 90%;
-    height: 70%;
-    background-color: #313131;
-    overflow: hidden;
-    margin: 10px;
-    margin-bottom: 0;
-  
+  Breakpoints mirrored exactly:
+    desktop default  → width: 20vw,  height: 23.5vw
+    ≤ 1024px         → width: 18vw,  height: 23.6vw
+    ≤ 768px          → (no size change in real card — only typography tweaks)
+    ≤ 480px          → width: 38vw,  height: 47vw
+*/
+
+/* ─── Main card shell ──────────────────────────────────────────────────────── */
+
+.skeletonCard {
+  /*
+    Sizing: matches .teamMember exactly.
+    Using vw units keeps the skeleton and loaded card pixel-identical at every
+    viewport width, eliminating the layout-shift that the old 40vw-tall skeleton
+    caused.
+  */
+  width: 20vw;
+  height: 23.5vw;
+  border-radius: 14px;
+
+  /*
+    position: relative lets the overlay bars (.skeletonOverlayBars) be
+    positioned absolutely inside the card — mirrors how .overlayInfo works in
+    the real card.
+  */
+  position: relative;
+
+  /*
+    overflow: hidden clips the shimmer wave at the rounded corners, giving the
+    same visual silhouette as .ImgDiv { overflow: hidden }.
+  */
+  overflow: hidden;
+
+  /*
+    margin-bottom mirrors .teamMember { margin-bottom: 4vw } so the skeleton
+    row and the loaded row occupy identical vertical space.
+  */
+  margin-bottom: 4vw;
+
+  /*
+    react-loading-skeleton renders the shimmer on a <span>.  We need the span
+    (skeletonFill) to stretch to fill this wrapper, so we use a flex column.
+  */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Full-bleed shimmer ───────────────────────────────────────────────────── */
+
+.skeletonFill {
+  /*
+    Force the skeleton span to fill the entire card.
+    react-loading-skeleton will still apply its shimmer animation; we are only
+    overriding the geometry.
+  */
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 14px !important;
+
+  /*
+    line-height: 1 prevents the browser from adding implicit descender space
+    below an inline element, which would make the shimmer a pixel or two taller
+    than the wrapper.
+  */
+  line-height: 1;
+  display: block;
+}
+
+/* ─── Bottom name / role overlay bars ─────────────────────────────────────── */
+
+.skeletonOverlayBars {
+  /*
+    Mirror .overlayInfo { position: absolute; bottom: 20px }.
+    These bars sit *on top of* the shimmer (z-index > 0 of the shimmer layer).
+  */
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  padding: 0 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  /*
+    Pointer-events: none so the bars never block interaction (consistent with
+    aria-hidden="true" on the wrapper element in JSX).
+  */
+  pointer-events: none;
+}
+
+/*
+  The individual bar elements (.skeletonRoleBar, .skeletonNameBar) are sized
+  via the width/height props passed directly to <Skeleton> in JSX so they scale
+  relative to the card width automatically.  No extra SCSS rules needed here.
+*/
+
+/* ─── Featured size modifier ───────────────────────────────────────────────── */
+
+/*
+  NOTE: The exact featured dimensions are not yet finalised in the real
+  TeamCard.  Update this block in lock-step when .featured is added to
+  src/components/TeamCard/styles/TeamCard.module.scss.
+*/
+.featured {
+  /* Stub — will be fleshed out in Step 3 alongside the hero row layout.    */
+  /* Example: width: 26vw; height: 30vw;                                    */
+}
+
+/* ─── Responsive breakpoints (mirrored exactly from TeamCard.module.scss) ─── */
+
+@media (max-width: 1024px) {
+  .skeletonCard {
+    height: 23.6vw;
+    width: 18vw;
   }
-  
-  .skeletonBack2{
-    width: 90%;
-    height: 20%;
-    background-color: #313131;
-    overflow: hidden;
-    margin: 10px;
+}
+
+/*
+  768px breakpoint: the real card only changes typography at this breakpoint
+  (font sizes, overlayInfo bottom offset), not card dimensions.  No size
+  override needed here for the skeleton.
+*/
+
+@media (max-width: 480px) {
+  .skeletonCard {
+    height: 47vw;
+    width: 38vw;
+    margin-bottom: 10vw;
   }
-  
-  
-  .skeletonDiv {
-    position: relative;
-    height: 40vw;
-    width: 20vw;
-    overflow: hidden;
-    bottom: 10px;
-    border: 1px solid rgba(94, 73, 73, 0.3);
-    border-radius: 10px;
-    background-color: #2a2a2a90;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-  
-  .skeletonOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
-  
-  @media (max-width: 480px) {
-    .skeletonDiv{
-      height: 47vw;
-      width: 38vw;
-    }
-  }
+}
