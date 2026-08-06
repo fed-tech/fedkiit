@@ -267,4 +267,4 @@ const Events = () => {
   );
 };
 
-export default Events;s
+export default Events;
