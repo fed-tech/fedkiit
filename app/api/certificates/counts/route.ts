@@ -1,10 +1,10 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json(); // expect { ids: string[] }
+    const body = await req.json();
     const ids: string[] = Array.isArray(body?.ids) ? body.ids : [];
 
     const result: Record<string, number> = {};

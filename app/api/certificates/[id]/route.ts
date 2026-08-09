@@ -1,17 +1,18 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, context: { params: Promise<{ id: string }> | { id: string } }) {
   try {
-    const id = params.id;
+    const params = await (context as any).params;
+    const id = params?.id;
+    if (!id) return NextResponse.json([], { status: 200 });
+
     const certDir = path.join(process.cwd(), "public", "certificates", id);
+    if (!fs.existsSync(certDir)) return NextResponse.json([], { status: 200 });
 
-    if (!fs.existsSync(certDir)) {
-      return NextResponse.json([], { status: 200 });
-    }
-
-    const files = fs.readdirSync(certDir)
+    const files = fs
+      .readdirSync(certDir)
       .filter((f) => /\.(png|jpe?g|pdf)$/i.test(f))
       .map((name) => ({ name, url: `/certificates/${id}/${name}` }));
 
