@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { SafeUser } from "@/lib/auth/access";
-import { FORM_ANALYTICS_ROLES } from "@/lib/auth/roles";
+import { FORM_ANALYTICS_ROLES, FORM_ATTENDANCE_ROLES } from "@/lib/auth/roles";
 import { envList, getEnv } from "@/lib/env";
 
 /**
@@ -18,6 +18,9 @@ import { envList, getEnv } from "@/lib/env";
 export const PERMISSIONS = {
   /** Read a form's registration analytics (EventStats). */
   FORM_ANALYTICS_VIEW: new Set<string>(FORM_ANALYTICS_ROLES),
+
+  /** Scan a QR and mark a registrant present. */
+  FORM_ATTENDANCE_MARK: new Set<string>(FORM_ATTENDANCE_ROLES),
 } satisfies Record<string, ReadonlySet<string>>;
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -36,6 +39,25 @@ export function can(
 }
 
 /**
+ * Role check, or failing that an address on a configured allowlist.
+ *
+ * The allowlist exists for accounts whose role cannot express what they are
+ * for: a shared scanning login is a plain USER, and promoting it to ADMIN to
+ * let it scan would also let it edit and delete events.
+ */
+function canByRoleOrEmail(
+  user: Pick<SafeUser, "access" | "email"> | null | undefined,
+  permission: Permission,
+  configured: string | undefined,
+): boolean {
+  if (!user) return false;
+  if (can(user, permission)) return true;
+
+  const allowed = envList(configured).map((entry) => entry.toLowerCase());
+  return allowed.includes(user.email.toLowerCase());
+}
+
+/**
  * The whole of the Express analytics rule, in one place:
  *
  *   if (!allowedUsers.includes(req.user.access) && req.user.email != "srex@…")
@@ -49,11 +71,27 @@ export function can(
 export function canViewFormAnalytics(
   user: Pick<SafeUser, "access" | "email"> | null | undefined,
 ): boolean {
-  if (!user) return false;
-  if (can(user, "FORM_ANALYTICS_VIEW")) return true;
-
-  const allowed = envList(getEnv().FORM_ANALYTICS_ALLOWED_EMAILS).map((entry) =>
-    entry.toLowerCase(),
+  return canByRoleOrEmail(
+    user,
+    "FORM_ANALYTICS_VIEW",
+    getEnv().FORM_ANALYTICS_ALLOWED_EMAILS,
   );
-  return allowed.includes(user.email.toLowerCase());
+}
+
+/**
+ * May scan a QR and mark someone present.
+ *
+ * Grants the scanner page and `markAttendance`, and nothing else — an account
+ * listed in `FORM_ATTENDANCE_ALLOWED_EMAILS` still cannot add, edit or delete
+ * an event, because those routes ask `isAdmin` and this does not change what
+ * role the account holds.
+ */
+export function canMarkAttendance(
+  user: Pick<SafeUser, "access" | "email"> | null | undefined,
+): boolean {
+  return canByRoleOrEmail(
+    user,
+    "FORM_ATTENDANCE_MARK",
+    getEnv().FORM_ATTENDANCE_ALLOWED_EMAILS,
+  );
 }
