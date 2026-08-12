@@ -1,9 +1,7 @@
-// Route entry — renders the component ported from
-// FED-Frontend/src/pages/Blog/Blog.jsx
-"use client";
+// /Blog — content moved to /Insights, which shows blogs and socials together.
+// Kept as a redirect so existing links and search results keep working.
+import { redirect } from "next/navigation";
 
-import Blog from "@/src/views/Blog/Blog";
-
-export default function Page() {
-  return <Blog />;
+export default function BlogPage() {
+  redirect("/Insights");
 }

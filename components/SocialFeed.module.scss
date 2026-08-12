@@ -1,0 +1,57 @@
+// SCSS module for SocialFeed.
+// This project does NOT load Tailwind (see app/globals.scss), so all layout
+// must come from CSS modules like this one.
+
+.feed {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start; // tops of all columns line up
+  gap: 2rem;
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.card {
+  flex: 1 1 280px;
+  min-width: 280px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column; // each card stacks its content vertically
+  gap: 0.75rem;
+}
+
+.embed {
+  width: 100%;
+  border: 1px solid #27272a;
+  border-radius: 0.75rem;
+  min-height: 540px;
+}
+
+.embedLinkedin {
+  composes: embed;
+  min-height: 400px;
+  background: #fff;
+}
+
+.caption {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  padding: 0 0.25rem;
+  margin: 0;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 3rem 0;
+}
+
+@media (max-width: 700px) {
+  .card {
+    max-width: 100%;
+  }
+}

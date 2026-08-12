@@ -42,6 +42,13 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [
+          {
+            // Instagram and LinkedIn embeds on /Insights are iframes; without
+            // this they are blocked outright.
+            key: "Content-Security-Policy",
+            value:
+              "frame-src 'self' https://www.instagram.com https://www.linkedin.com;",
+          },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

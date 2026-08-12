@@ -290,3 +290,16 @@ model ContactUs {
 
   @@map("contactus")
 }
+
+model SocialPost {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  platform  String   // 'instagram' | 'linkedin'
+  url       String   // original post URL
+  embedUrl  String   // derived iframe-ready URL
+  caption   String?
+  isVisible Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("social_posts")
+}
