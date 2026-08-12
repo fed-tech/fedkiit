@@ -57,6 +57,7 @@ const Sidebar = ({ activepage, handleChange }) => {
       "Form": "/profile/Form",
       "Members": "/profile/members",
       "Attendance": "/profile/attendance",
+      "Social": "/profile/social",
       "Certificates": "/profile/certificates",
       "Profile": "/profile"
     };
@@ -198,6 +199,26 @@ const Sidebar = ({ activepage, handleChange }) => {
           }}
         />{" "}
         <Link href={"/profile/attendance"}> Attendance</Link>
+      </div>
+
+      <div
+        onClick={() => handleMenuClick("Social")}
+        style={{
+          background: activepage === "Social" ? "var(--primary)" : "transparent",
+          WebkitBackgroundClip: activepage === "Social" ? "text" : "initial",
+          backgroundClip: activepage === "Social" ? "text" : "initial",
+          color: activepage === "Social" ? "transparent" : "inherit",
+          marginLeft: "-6px",
+        }}
+      >
+        <FaRegNewspaper
+          size={17}
+          style={{
+            color: activepage === "Social" ? "#FF8A00" : "white",
+            marginRight: "10px",
+          }}
+        />{" "}
+        <Link href={"/profile/social"}> Social</Link>
       </div>
     </>
   );

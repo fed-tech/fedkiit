@@ -70,6 +70,15 @@ const schema = z.object({
   FORM_ANALYTICS_ALLOWED_EMAILS: z.string().optional(),
 
   /**
+   * Addresses allowed to scan QRs and mark attendance regardless of role.
+   * Comma-separated. Intended for shared scanning accounts such as
+   * attendance@fedkiit.com, which is a plain USER and would otherwise need
+   * full ADMIN — and with it the ability to edit and delete events — just to
+   * run a scanner at the door.
+   */
+  FORM_ATTENDANCE_ALLOWED_EMAILS: z.string().optional(),
+
+  /**
    * Calendar month the academic year rolls over in, 1-12. July by default:
    * a student admitted in 2022 is in their 4th year until July 2026, not until
    * January 2026.

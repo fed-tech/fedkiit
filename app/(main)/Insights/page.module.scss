@@ -1,0 +1,23 @@
+.page {
+  width: 100%;
+  padding: 3rem 0 4rem;
+}
+
+.section {
+  padding: 1rem 0 2rem;
+}
+
+.heading {
+  text-align: center;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+
+  span {
+    background: var(--primary, linear-gradient(135deg, #ffbe0b, #f42b03));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}

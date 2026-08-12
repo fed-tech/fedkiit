@@ -37,3 +37,25 @@ export const FORM_ANALYTICS_ROLES_CLIENT: readonly string[] = [
   ...FORM_ANALYTICS_ROLES,
   "ADMIN",
 ];
+
+/**
+ * May scan a QR and mark someone present.
+ *
+ * This is the list the Express author wrote and then commented out, in
+ * FED-Backend/routes/api/forms/formRoutes.js — `markAttendance` shipped with no
+ * check at all, so any signed-in participant could mark themselves present with
+ * a QR they generated themselves. Restricting it to ADMIN closed that, but also
+ * locked out the attendance@fedkiit.com service account, whose whole purpose is
+ * scanning. The intended list is restored here instead.
+ *
+ * Deliberately narrower than "any club member": marking attendance decides who
+ * is eligible for a certificate.
+ */
+export const FORM_ATTENDANCE_ROLES = [
+  "SENIOR_EXECUTIVE_TECHNICAL",
+  "SENIOR_EXECUTIVE_CREATIVE",
+  "SENIOR_EXECUTIVE_MARKETING",
+  "SENIOR_EXECUTIVE_OPERATIONS",
+  "SENIOR_EXECUTIVE_PR_AND_FINANCE",
+  "SENIOR_EXECUTIVE_HUMAN_RESOURCE",
+] as const;
