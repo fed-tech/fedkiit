@@ -1,11 +1,40 @@
+/* ── Typography tokens from Hero design system ─────────────────────────── */
+
+/*
+ * Kicker / eyebrow label — matches Hero .eyebrow exactly:
+ * font-size 0.75rem · weight 700 · letter-spacing 0.12em · uppercase · --accent
+ */
+.sectionKicker {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+  text-align: center;
+}
+
+/*
+ * Heading accent word — flat orange, bold. No gradient. Matches the weight
+ * pairing on the homepage: light base + bold accent word.
+ */
+.headingAccent {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── Section headings ────────────────────────────────────────────────────── */
+
 .Team h2 {
   text-align: center;
   font-size: 50px;
-  margin-top: 20px;
+  font-weight: 400;
+  margin-top: 8px;
 }
 
+/* Legacy rule kept for any un-migrated span; headingAccent overrides color */
 .Team h2 span {
-  color: #FF8A00;
+  color: var(--accent);
 }
 
 .para p {
@@ -16,6 +45,8 @@
   padding-bottom: 0;
   font-size: 20px;
   font-weight: 400;
+  line-height: 1.65;
+  color: var(--text-secondary);
   margin-bottom: 15px;
 }
 
@@ -38,17 +69,20 @@
 
 .teamSection h3 {
   font-size: 40px;
-  color: #FF8A00;
+  /* Base heading is white; accent word gets color from .headingAccent */
+  color: var(--text-primary);
+  font-weight: 400;
   margin-bottom: 60px;
   margin-left: 50px;
 }
 
+/* Outer wrapper span in title JSX — reset weight; accent word controls its own */
 .teamSection span {
-  font-weight: 800;
+  font-weight: 400;
 }
 
 .Team strong {
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .teamTitle {
@@ -194,17 +228,18 @@
 /* Name */
 .name {
   font-size: 32px;
-  font-weight: 800;
-  color: #FF8A00;
+  /* Reduced from 800 — matches homepage's light-heading + accent pairing */
+  font-weight: 600;
+  color: var(--accent);
   margin: 0;
 }
 
-/* Role title */
+/* Role title — matches Hero eyebrow token exactly */
 .role {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: #FF8A00;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent);
   margin-top: 8px;
   text-transform: uppercase;
 }
@@ -219,8 +254,9 @@
 .intro p,
 .vision p {
   font-size: 16px;
-  line-height: 1.8;
-  color: #e0e0e0;
+  line-height: 1.7;
+  /* Use the same muted body-copy tone as homepage lede */
+  color: var(--text-secondary);
   margin: 0;
 }
 

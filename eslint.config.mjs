@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Plain Node.js scratch script — not part of the app, uses require()
+    "test-db.js",
   ]),
 
   {

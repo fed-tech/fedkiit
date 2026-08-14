@@ -85,19 +85,21 @@
   z-index: 2;
 }
 
+/* Matches Hero .eyebrow exactly: 0.75rem / 700 / 0.12em / uppercase / --accent */
 .role {
-  font-size: 0.78em;
+  font-size: 0.75rem;
   color: var(--accent);
   margin: 0 0 4px 0;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
 }
 
 .memName {
   margin: 0;
   font-size: 1.2em;
-  font-weight: 700;
+  /* Reduced from 700 — lighter homepage headline weight pairing */
+  font-weight: 600;
   color: #fff;
   white-space: nowrap;
   overflow: hidden;

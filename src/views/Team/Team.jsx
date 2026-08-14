@@ -179,7 +179,7 @@ const Team = () => {
       return order.indexOf(a.role) - order.indexOf(b.role);
     });
 
-  const TeamSection = ({ title, members }) => {
+  const TeamSection = ({ title, members, kicker }) => {
     const membersPerRow = windowWidth < 500 ? 2 : 4;
     const remainder = members.length % membersPerRow;
 
@@ -188,6 +188,7 @@ const Team = () => {
 
     return (
       <div className={styles.teamSection}>
+        {kicker && <p className={styles.sectionKicker}>{kicker}</p>}
         {title && <h3>{title}</h3>}
 
         <div className={styles.teamGrid}>
@@ -210,17 +211,10 @@ const Team = () => {
   return (
     <div className={styles.Team}>
 
+      <p className={styles.sectionKicker}>OUR PEOPLE</p>
       <h2>
         Meet Our{" "}
-        <span
-          style={{
-            background: "var(--primary)",
-            WebkitBackgroundClip: "text",
-            color: "transparent",
-          }}
-        >
-          Team
-        </span>
+        <span className={styles.headingAccent}>Team</span>
       </h2>
 
       <div className={styles.para}>
@@ -272,18 +266,11 @@ const Team = () => {
           {error && <div className={styles.error}>{error.message}</div>}
 
           <TeamSection
+            kicker="LEADERSHIP"
             title={
               <span>
                 <span style={{ color: "#fff" }}>Board Of </span>
-                <strong
-                  style={{
-                    background: "var(--primary)",
-                    WebkitBackgroundClip: "text",
-                    color: "transparent",
-                  }}
-                >
-                  Directors
-                </strong>
+                <strong className={styles.headingAccent}>Directors</strong>
               </span>
             }
             members={directorsAndAbove}
@@ -304,15 +291,7 @@ const Team = () => {
               title={
                 <span>
                   <span style={{ color: "#fff" }}>Team </span>
-                  <strong
-                    style={{
-                      background: "var(--primary)",
-                      WebkitBackgroundClip: "text",
-                      color: "transparent",
-                    }}
-                  >
-                    {group.role}
-                  </strong>
+                  <strong className={styles.headingAccent}>{group.role}</strong>
                 </span>
               }
               members={group.members}
