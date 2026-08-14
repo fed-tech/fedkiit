@@ -17,8 +17,6 @@ const TeamCard = ({
   onRemove,
   size = "default",
 }) => {
-  const [showMore, setShowMore] = useState(false);
-  const [contentLoaded, setContentLoaded] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const extraData = member?.extra || {
@@ -38,10 +36,6 @@ const TeamCard = ({
 
   const authCtx = useContext(AuthContext);
 
-  const isDirectorRole =
-    ["PRESIDENT", "VICEPRESIDENT"].includes(member?.access) ||
-    member?.access?.startsWith("DIRECTOR_");
-
   const handleImageLoad = () => {
     setIsImageLoaded(true);
   };
@@ -53,11 +47,6 @@ const TeamCard = ({
       return "https://" + url;
     }
   };
-
-  // A "Know More" toggle only makes sense for director-level members that
-  // actually have bio text to show — everyone else gets a static card with
-  // no extra affordance.
-  const hasBio = isDirectorRole && !!extraData?.know;
 
   //for name overflow
 
@@ -105,71 +94,44 @@ const TeamCard = ({
 
           <div className={styles.scrim} aria-hidden="true" />
 
-          {!showMore ? (
-            <>
-              <div className={styles.overlayInfo}>
-                {extraData.designation && (
-                  <p className={styles.role}>{extraData.designation}</p>
-                )}
-                <h4
-                  ref={nameRef}
-                  className={`${styles.memName} ${
-                    isOverflowing ? styles.responsive : ""
-                  }`}
-                >
-                  {member?.name}
-                </h4>
-              </div>
+          <div className={styles.overlayInfo}>
+            {extraData.designation && (
+              <p className={styles.role}>{extraData.designation}</p>
+            )}
+            <h4
+              ref={nameRef}
+              className={`${styles.memName} ${
+                isOverflowing ? styles.responsive : ""
+              }`}
+            >
+              {member?.name}
+            </h4>
+          </div>
 
-              {(extraData?.linkedin || extraData?.github) && (
-                <div className={styles.socialChips}>
-                  {extraData?.linkedin && (
-                    <a
-                      href={handleLink(extraData?.linkedin)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.chip}
-                      aria-label={`${member?.name} on LinkedIn`}
-                    >
-                      <FaLinkedin />
-                    </a>
-                  )}
-                  {extraData?.github && (
-                    <a
-                      href={handleLink(extraData?.github)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.chip}
-                      aria-label={`${member?.name} on GitHub`}
-                    >
-                      <FaGithub />
-                    </a>
-                  )}
-                </div>
-              )}
-
-              {hasBio && (
-                <button
-                  onClick={() => setShowMore(true)}
-                  aria-expanded={showMore}
-                  className={styles.knowMoreBtn}
+          {(extraData?.linkedin || extraData?.github) && (
+            <div className={styles.socialChips}>
+              {extraData?.linkedin && (
+                <a
+                  href={handleLink(extraData?.linkedin)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.chip}
+                  aria-label={`${member?.name} on LinkedIn`}
                 >
-                  Know More
-                </button>
+                  <FaLinkedin />
+                </a>
               )}
-            </>
-          ) : (
-            <div className={styles.bioOverlay}>
-              <div className={styles.knowPara}>
-                <p>{extraData.know}</p>
-              </div>
-              <button
-                onClick={() => setShowMore(false)}
-                aria-expanded={showMore}
-                className={styles.backBtn}
-              >
-                Back
-              </button>
+              {extraData?.github && (
+                <a
+                  href={handleLink(extraData?.github)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.chip}
+                  aria-label={`${member?.name} on GitHub`}
+                >
+                  <FaGithub />
+                </a>
+              )}
             </div>
           )}
         </div>
