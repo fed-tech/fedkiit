@@ -2,11 +2,6 @@ import { dummyCertificate } from "@/lib/services/certificates";
 import { body, expressError, handle, json } from "@/lib/api/express";
 import { getCurrentUser, isAdmin } from "@/lib/auth/access";
 
-/**
- * POST /api/certificate/dummyCertificate
- * Port of controllers/certificate/testNameController.js — preview data for the
- * admin certificate designer.
- */
 export async function POST(request: Request) {
   return handle(async () => {
     const user = await getCurrentUser();
@@ -18,8 +13,10 @@ export async function POST(request: Request) {
       fieldValues?: Record<string, string>;
     }>(request);
 
+    if (!b.eventId) return expressError(400, "Event ID is required");
+
     const data = await dummyCertificate({
-      eventId: b.eventId ?? "",
+      eventId: b.eventId,
       fieldValues: b.fieldValues,
     });
 

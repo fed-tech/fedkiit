@@ -14,7 +14,9 @@ import { useRouter, useParams } from "next/navigation";
 
 const CertificatesPreview = () => {
   const authCtx = useContext(AuthContext);
-  const { eventId, eventTitle } = useParams();
+  const params = useParams();
+  const eventId = params?.id ?? params?.eventId ?? params?.formId;
+  const eventTitle = params?.eventTitle ?? "Event Name";
   const router = useRouter();
   const [certificateData, setCertificateData] = useState({});
   const [name, setName] = useState("");

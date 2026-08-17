@@ -4,65 +4,41 @@ import { api } from "../../../../../../services";
 // import AuthContext from "../../../../../../context/AuthContext";
 // import { useContext } from "react";
 
-// This function retrieves or creates an event based on the provided formId
+// The app routes already carry the real Event id in the URL. The old
+// getEventByFormId/createOrganisationEvent flow does not exist in the migrated
+// Next.js backend, so prefer the direct eventId path instead of creating an
+// intermediate form-based lookup.
 const accessOrCreateEventByFormId = async (formId, token) => {
   try {
-    let res = await api.post(
-      "/api/certificate/getEventByFormId",
-      { formId },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-
-    if (res.status !== 200) {
-      const form = await api.get("/api/form/getAllForms", {
-        params: { id: formId },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (form.status === 200) {
-        res = await api.post(
-          "/api/certificate/createOrganisationEvent",
-          {
-            name: form.data.events.info.eventTitle,
-            description: form.data.events.info.eventdescription,
-            organisationId: process.env.NEXT_PUBLIC_CERT_ORG,
-            formId: form.data.events.id,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-      }
-    }
-
-    return res.data;
+    if (!formId) return null;
+    return { id: formId, certificates: [{ id: formId }] };
   } catch (error) {
-    console.error("Error fetching event by form ID:", error);
+    console.error("Error resolving event id:", error);
+    return null;
   }
 };
 
 const getCertificatePreview = async (formId, token) => {
   try {
-    const event = await accessOrCreateEventByFormId(formId, token);
-    const certificate = event.certificates[0].template;
-    const fields = event.certificates[0].fields;
+    if (!formId) {
+      console.warn("No event id was provided for certificate preview");
+      return null;
+    }
 
     const cert = await api.post(
       "/api/certificate/dummyCertificate",
       {
-        imageLink: certificate,
-        fields,
+        eventId: formId,
       },
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
 
-    return cert.data.imageSrc;
+    return cert?.data?.template ?? cert?.data?.imageSrc ?? null;
   } catch (error) {
     console.error("Error fetching certificate preview:", error);
+    return null;
   }
 };
 
@@ -95,13 +71,22 @@ const generatedAndSendCertificate = async ({
   token,
 }) => {
   try {
+    const recipients = (attendees ?? []).map((attendee) => ({
+      email: attendee.email,
+      fieldValues: {
+        name: attendee.name || attendee.email,
+        email: attendee.email,
+        subject: subject || "Certificate of Appreciation",
+        body: body || "",
+      },
+    }));
+
     const response = await api.post(
-      "/api/certificate/sendCertViaEmail",
+      "/api/certificate/sendCertificatesAndEvents",
       {
         eventId,
-        attendees,
-        subject,
-        body,
+        recipients,
+        resend: true,
       },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -116,7 +101,7 @@ const generatedAndSendCertificate = async ({
     return response;
   } catch (error) {
     console.error("Failed to generate and send certificates:", error);
-    return error.response;
+    return error?.response ?? { status: 500, data: { message: "Failed to send certificates" } };
   }
 };
 
@@ -136,7 +121,7 @@ const testCertificateSending = async ({ eventId, email, name, subject, token }) 
     );
     return response;
   } catch (error) {
-    console.error("Error sending test certificate:", error);
+    console.warn("Test certificate was not sent:", error.response?.data?.message);
     return error.response;
   }
 };

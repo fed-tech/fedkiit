@@ -7,7 +7,7 @@ import { Button } from "../../../../../components";
 import { api } from "../../../../../services";
 import {
   accessOrCreateEventByFormId,
-  // getCertificatePreview,
+  getCertificatePreview,
   generatedAndSendCertificate,
 } from "./tools/certificateTools";
 import { Alert, MicroLoading } from "../../../../../microInteraction";
@@ -16,9 +16,11 @@ import AuthContext from "../../../../../context/AuthContext";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-const CertificatesForm = () => {
+const CertificatesForm = ({ eventId: propEventId } = {}) => {
   const authCtx = useContext(AuthContext);
-  const { eventId } = useParams();
+  const params = useParams();
+  const routeEventId = params?.id ?? params?.eventId ?? params?.formId;
+  const eventId = propEventId || routeEventId;
   const [certificate, setCertificate] = useState(null);
   const [certificateFile, setCertificateFile] = useState(null);
   const [fields, setFields] = useState([]);
@@ -136,41 +138,35 @@ const CertificatesForm = () => {
   };
 
   const handleRefresh = async () => {
-    if (!certificateFile) {
+    if (!eventId) {
       setAlert({
-        type: "warning",
-        message: "Please upload a certificate image first",
+        type: "error",
+        message: "Event ID is missing. Please open this page from the certificate list.",
         position: "top-right",
-        duration: 3000,
+        duration: 4000,
       });
       return;
     }
+
     setPreviewLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("image", certificateFile);
-      formData.append("fields", JSON.stringify(fields));
-      const response = await api.post(
-        "/api/certificate/dummyCertificate",
-        formData,
-        {
-          headers: { Authorization: `Bearer ${authCtx.token}` },
-        }
-      );
-      if (response.status !== 200) {
-        throw new Error(`API error: ${response.statusText}`);
+      const preview = await getCertificatePreview(eventId, authCtx.token);
+      if (!preview) {
+        throw new Error("No certificate template exists for this event yet.");
       }
-      setResponseImg(response.data.imageSrc);
+
+      setResponseImg(preview);
       setAlert({
         type: "success",
-        message: "Preview updated successfully",
+        message: "Preview loaded successfully",
         position: "top-right",
         duration: 2000,
       });
     } catch (error) {
       setAlert({
         type: "error",
-        message: "Error updating preview. Please try again",
+        message:
+          error?.message || "Error fetching preview. Please upload and save a template first.",
         position: "top-right",
         duration: 3000,
       });
@@ -180,6 +176,16 @@ const CertificatesForm = () => {
   };
 
   const handleSave = async () => {
+    if (!eventId) {
+      setAlert({
+        type: "error",
+        message: "Event ID is missing. Please open this page from the event certificate list.",
+        position: "top-right",
+        duration: 4000,
+      });
+      return;
+    }
+
     if (!certificateFile) {
       setAlert({
         type: "warning",
@@ -192,23 +198,9 @@ const CertificatesForm = () => {
 
     setSaveLoading(true);
     try {
-      const eventData = await accessOrCreateEventByFormId(
-        eventId,
-        authCtx.token
-      );
-      if (!eventData || !eventData.id) {
-        throw new Error("Failed to retrieve or create event.");
-      }
-
-      const formData = new FormData();
-      formData.append("image", certificateFile);
-      formData.append("eventId", eventData.id);
-      formData.append("fields", JSON.stringify(fields));
-
       const response = await api.post(
         "/api/certificate/addCertificateTemplate",
-        
-        formData, 
+        { eventId, template: certificate, fields },
         {
           headers: { Authorization: `Bearer ${authCtx.token}` },
         }
@@ -228,7 +220,7 @@ const CertificatesForm = () => {
       console.error("Error saving certificate template:", error);
       setAlert({
         type: "error",
-        message: "Error saving certificate template. Please try again",
+        message: error.response?.data?.message || "Error saving certificate template. Please try again",
         position: "top-right",
         duration: 3000,
       });

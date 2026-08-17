@@ -91,7 +91,6 @@ const Events = () => {
         try {
           // Try to fetch a list of certificates for the event and use length as count.
           // Adjust endpoint if your backend has a dedicated count endpoint.
-          
           const resp = await api.get(`/api/certificates/${id}`);
           // resp.data may be { files: [...] } or an array; be defensive:
           const data = resp.data;
@@ -125,6 +124,27 @@ const Events = () => {
       (a, b) =>
         new Date(b.info?.eventDate ?? 0).getTime() -
         new Date(a.info?.eventDate ?? 0).getTime()
+    );
+  };
+
+  const getEventId = (event) => {
+    const candidates = [
+      event?.id,
+      event?._id,
+      event?.formId,
+      event?.eventId,
+      event?.info?.id,
+      event?.info?._id,
+      event?.info?.formId,
+      event?.info?.eventId,
+      event?.extra?.id,
+      event?.extra?._id,
+      event?.extra?.formId,
+      event?.extra?.eventId,
+    ];
+
+    return candidates.find(
+      (value) => value !== undefined && value !== null && value !== "" && value !== "undefined" && value !== "null"
     );
   };
 
@@ -178,7 +198,12 @@ const Events = () => {
 
                 <tbody>
                   {events.map((event) => {
-                    const id = event.id ?? event._id ?? event._id?.toString();
+                    const id = getEventId(event)?.toString();
+                    if (!id) {
+                      console.warn("Certificate list event missing id:", event);
+                      return null;
+                    }
+
                     const certCount = certCounts[id] ?? 0;
 
                     return (

@@ -27,9 +27,11 @@ const Checkbox = ({ id, checked, onCheckedChange }) => {
   );
 };
 
-const SendCertificate = () => {
+const SendCertificate = ({ eventId: propEventId } = {}) => {
   const authCtx = useContext(AuthContext);
-  const { eventId } = useParams();
+  const params = useParams();
+  const routeEventId = params?.id ?? params?.eventId ?? params?.formId;
+  const eventId = propEventId || routeEventId;
   const [loading, setLoading] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [sendingMail, setSendingMail] = useState(false);
@@ -42,23 +44,47 @@ const SendCertificate = () => {
   const [uncheckedFilterText, setUncheckedFilterText] = useState("");
   const [checkedFilterText, setCheckedFilterText] = useState("");
   const [fileUploading, setFileUploading] = useState(false);
-  const [certificatePreview, setCertificatePreview] = useState("Loading...");
+  const [certificatePreview, setCertificatePreview] = useState(null);
   const [alert, setAlert] = useState(null);
   const [failedEmails, setFailedEmails] = useState([]);
+  const [deliveryError, setDeliveryError] = useState("");
   const [isFailedMinimized, setIsFailedMinimized] = useState(false);
 
   useEffect(() => {
     const fetchCertificatePreview = async () => {
+      if (!eventId || eventId === "undefined" || eventId === "null") {
+        setCertificatePreview(null);
+        setAlert({
+          type: "error",
+          message: "Event ID is missing from this link.",
+          position: "top-right",
+          duration: 4000,
+        });
+        setPreviewLoading(false);
+        return;
+      }
+
       setPreviewLoading(true);
       try {
         const preview = await getCertificatePreview(eventId, authCtx.token);
         if (preview) {
           setCertificatePreview(preview);
+        } else {
+          setCertificatePreview(null);
+          setAlert({
+            type: "warning",
+            message: "No certificate template has been saved for this event yet.",
+            position: "top-right",
+            duration: 4000,
+          });
         }
       } catch (error) {
+        setCertificatePreview(null);
         setAlert({
           type: "error",
-          message: "Failed to load certificate preview",
+          message:
+            error.response?.data?.message ||
+            "Failed to load certificate preview. Save a certificate template first.",
           position: "top-right",
           duration: 3000,
         });
@@ -205,6 +231,16 @@ const SendCertificate = () => {
         attendee.name.toLowerCase().includes(checkedFilterText.toLowerCase()))
   );
   const handleSendBatchMail = async () => {
+    if (!eventId) {
+      setAlert({
+        type: "error",
+        message: "Event ID is missing. Please open this page from the certificate list.",
+        position: "top-right",
+        duration: 4000,
+      });
+      return;
+    }
+
     if (!checkedAttendees.length) {
       setAlert({
         type: "warning",
@@ -217,37 +253,23 @@ const SendCertificate = () => {
 
     setSendingMail(true);
     setFailedEmails([]);
+    setDeliveryError("");
 
     try {
-      const eventData = await accessOrCreateEventByFormId(
-        eventId,
-        authCtx.token
-      );
-      if (!eventData || !eventData.id || !eventData.certificates?.length) {
-        throw new Error(
-          "Event data retrieval failed or certificates not found"
-        );
-      }
-      const certificateId =
-        eventData.certificates[eventData.certificates.length - 1]?.id;
-
-      if (!certificateId) {
-        throw new Error("Certificate ID not found");
+      if (!eventId) {
+        throw new Error("Event ID is missing");
       }
 
       const attendees = checkedAttendees.map((attendee) => ({
-        fieldValues: {
-          name: attendee.name || "",
-          email: attendee.email,
-        },
-        certificateId,
+        email: attendee.email,
+        name: attendee.name || "",
       }));
 
       if (attendees.length === 0) {
         throw new Error("No valid attendees found");
       }
       const response = await generatedAndSendCertificate({
-        eventId: eventData.id,
+        eventId,
         attendees,
         subject,
         body,
@@ -274,10 +296,12 @@ const SendCertificate = () => {
         throw new Error(response?.data?.error || "Failed to send certificates");
       }
     } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      setDeliveryError(message);
       console.error("Error in handleSendBatchMail:", error);
       setAlert({
         type: "error",
-        message: "Failed to send certificates: " + error.message,
+        message: "Failed to send certificates: " + message,
         position: "top-right",
         duration: 3000,
       });
@@ -287,6 +311,16 @@ const SendCertificate = () => {
   };
 
   const handleTestMail = async () => {
+    if (!eventId) {
+      setAlert({
+        type: "error",
+        message: "Event ID is missing. Please open this page from the certificate list.",
+        position: "top-right",
+        duration: 4000,
+      });
+      return;
+    }
+
     if (!checkedAttendees.length) {
       setAlert({
         type: "warning",
@@ -298,17 +332,14 @@ const SendCertificate = () => {
     }
 
     setSendingMail(true);
+    setDeliveryError("");
     try {
-      const eventData = await accessOrCreateEventByFormId(
-        eventId,
-        authCtx.token
-      );
-      if (!eventData || !eventData.id) {
-        throw new Error("Event data retrieval failed");
+      if (!eventId) {
+        throw new Error("Event ID is missing");
       }
 
       const response = await testCertificateSending({
-        eventId: eventData.id,
+        eventId,
         email: checkedAttendees[0].email,
         name: checkedAttendees[0].name || "",
         subject: `[TEST] ${subject}`,
@@ -323,12 +354,20 @@ const SendCertificate = () => {
           duration: 3000,
         });
       } else {
-        throw new Error(response?.data?.error || "Failed to send test mail");
+        throw new Error(
+          response?.data?.message ||
+            response?.data?.error ||
+            "Failed to send test mail"
+        );
       }
     } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      setDeliveryError(message);
       setAlert({
         type: "error",
-        message: "Failed to send test mail: " + error.message,
+        message:
+          "Failed to send test mail: " +
+          message,
         position: "top-right",
         duration: 3000,
       });
@@ -374,7 +413,7 @@ const SendCertificate = () => {
               >
                 <MicroLoading />
               </div>
-            ) : (
+            ) : certificatePreview ? (
               <img
                 src={certificatePreview}
                 alt="Certificate Preview"
@@ -385,6 +424,10 @@ const SendCertificate = () => {
                   maxHeight: "270px",
                 }}
               />
+            ) : (
+              <p style={{ textAlign: "center", marginTop: 120 }}>
+                No certificate template found. Save one from Create Certificate first.
+              </p>
             )}
           </div>
           <div
@@ -581,6 +624,14 @@ const SendCertificate = () => {
             onChange={(e) => setMailFrequency(e.target.value)}
             style={{ marginTop: -10, width: "100%" }}
           />
+          {deliveryError && (
+            <p
+              role="alert"
+              style={{ color: "#ff6b6b", margin: "10px 5px 0", lineHeight: 1.4 }}
+            >
+              {deliveryError}
+            </p>
+          )}
           <div
             style={{
               display: "flex",

@@ -1,7 +1,12 @@
-import { addCertificateTemplate } from "@/lib/services/certificates";
+import { dummyCertificate } from "@/lib/services/certificates";
 import { body, expressError, handle, json } from "@/lib/api/express";
 import { getCurrentUser, isAdmin } from "@/lib/auth/access";
 
+/**
+ * POST /api/certificate/dummyCertificate
+ * Port of controllers/certificate/testNameController.js — preview data for the
+ * admin certificate designer.
+ */
 export async function POST(request: Request) {
   return handle(async () => {
     const user = await getCurrentUser();
@@ -10,19 +15,14 @@ export async function POST(request: Request) {
 
     const b = await body<{
       eventId?: string;
-      template?: string;
-      fields?: unknown[];
+      fieldValues?: Record<string, string>;
     }>(request);
 
-    if (!b.eventId) return expressError(400, "Event ID is required");
-    if (!b.template) return expressError(400, "A template image is required");
-
-    const data = await addCertificateTemplate({
-      eventId: b.eventId,
-      template: b.template,
-      fields: (b.fields ?? []) as any,
+    const data = await dummyCertificate({
+      eventId: b.eventId ?? "",
+      fieldValues: b.fieldValues,
     });
 
-    return json({ success: true, data });
+    return json({ success: true, ...data });
   });
 }

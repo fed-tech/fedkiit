@@ -6,12 +6,13 @@ import { api } from "../../../../../services";
 import { ComponentLoading } from "../../../../../microInteraction";
 import styles from "./styles/VerifyCertificate.module.scss";
 import { CheckCircle } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import Share from "../../../../../features/Modals/Event/ShareModal/ShareModal";
 import shareOutline from "../../../../../assets/images/shareOutline.svg";
 import { useParams, useSearchParams } from "next/navigation";
 
 const VerifyCertificate = () => {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const certificateId = searchParams.get("id");
   const { issuedCertificateId } = useParams();
   const [certificateData, setCertificateData] = useState(null);
@@ -48,6 +49,8 @@ const VerifyCertificate = () => {
             email: response.data.certificate.email || "N/A",
             event: response.data.event?.name || "N/A",
             date: response.data.event?.createdAt || "N/A",
+            fields: response.data.certificate.fields || response.data.template?.fields || [],
+            fieldValues: response.data.certificate.fieldValues || {},
           });
         } else {
           setError("Invalid certificate data.");
@@ -73,6 +76,31 @@ const VerifyCertificate = () => {
       document.body.removeChild(link);
     }
   };
+
+  const certificateFields = (certificateData?.fields || [])
+    .map((field) => {
+      const fieldName = String(field.fieldName || "").trim();
+      const valueKey = Object.keys(certificateData?.fieldValues || {}).find(
+        (key) => key.toLowerCase() === fieldName.toLowerCase()
+      );
+      const value = valueKey ? certificateData.fieldValues[valueKey] : "";
+      return { ...field, value };
+    })
+    .filter((field) => field.fieldName && field.value);
+
+  // Older templates may not have editable field coordinates. Keep these
+  // certificates readable by placing the recipient name in the intended
+  // centre area until the template is edited with a named field.
+  if (!certificateFields.length && certificateData?.name && certificateData.name !== "N/A") {
+    certificateFields.push({
+      fieldName: "name",
+      value: certificateData.name,
+      x: 50,
+      y: 53,
+      fontSize: 22,
+      fontColor: "#1c1c1c",
+    });
+  }
 
   const copyLink = () => {
     navigator.clipboard.writeText(currentUrl).then(() => {
@@ -110,7 +138,34 @@ const VerifyCertificate = () => {
 
       <div className={styles.contentWrapper}>
         <div className={styles.imageContainer}>
-          <img src={certificateData.imageSrc} alt="Verified Certificate" />
+          <div className={styles.certificateCanvas}>
+            <img src={certificateData.imageSrc} alt="Verified Certificate" />
+            {certificateFields.map((field, index) => (
+              <span
+                className={styles.certificateField}
+                key={`${field.fieldName}-${index}`}
+                style={{
+                  left: `${Number(field.x) || 50}%`,
+                  top: `${Number(field.y) || 53}%`,
+                  fontSize: `${Number(field.fontSize) || 22}px`,
+                  color: field.fontColor || field.color || "#1c1c1c",
+                  fontFamily: field.fontFamily || "inherit",
+                }}
+              >
+                {String(field.value)}
+              </span>
+            ))}
+            <div className={styles.qrCode} title="Scan to verify this certificate">
+              <QRCodeSVG
+                value={currentUrl}
+                size={52}
+                bgColor="#ffffff"
+                fgColor="#111111"
+                level="M"
+                includeMargin={false}
+              />
+            </div>
+          </div>
         </div>
 
         <div className={styles.detailsContainer}>

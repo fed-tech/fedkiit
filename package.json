@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node  node_modules/next/dist/bin/next dev",
+    "dev": "node scripts/with-env.mjs dev",
     "build": "node scripts/with-env.mjs build",
     "start": "node scripts/with-env.mjs start",
     "lint": "eslint",

@@ -24,9 +24,12 @@ export async function POST(request: Request) {
       name: b.name ?? user.name ?? to,
       eventName: b.eventName ?? "a FED KIIT event",
       certificateId: b.certificateId ?? "TEST-CERTIFICATE",
+      isTest: true,
     });
 
-    if (!result.sent) return expressError(502, "Could not send the test email");
+    if (!result.sent) {
+      return expressError(502, result.reason || "Could not send the test email");
+    }
 
     return json({ success: true, message: `Test certificate sent to ${to}` });
   });

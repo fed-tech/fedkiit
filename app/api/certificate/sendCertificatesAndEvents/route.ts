@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       eventId?: string;
       recipients?: Array<{ email: string; fieldValues?: Record<string, string> }>;
       emails?: string[];
+      resend?: boolean;
     }>(request);
 
     // Accepts either a rich recipient list or a plain array of addresses.
@@ -29,8 +30,22 @@ export async function POST(request: Request) {
     const data = await sendCertificatesAndEvents({
       eventId: b.eventId ?? "",
       recipients,
+      resend: b.resend === true,
     });
 
-    return json({ success: true, message: "Certificates processed", data });
+    const status = data.failures.length > 0 ? 207 : 200;
+    return json(
+      {
+        success: data.failures.length === 0,
+        message:
+          data.failures.length > 0
+            ? "Some certificates could not be emailed"
+            : "Certificates sent successfully",
+        data,
+        failed: data.failures,
+      },
+      status,
+    );
   });
 }
+
