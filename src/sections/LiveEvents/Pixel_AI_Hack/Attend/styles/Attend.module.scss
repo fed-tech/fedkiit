@@ -80,10 +80,6 @@
   text-align: left;
   transition: transform 0.3s;
 
-  &:hover {
-    transform: scale(1.05);
-  }
-
   @media (max-width: 768px) {
     max-width: 80%;
   }

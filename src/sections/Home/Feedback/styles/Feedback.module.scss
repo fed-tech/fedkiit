@@ -100,29 +100,6 @@
   background: var(--surface-1);
   box-shadow: var(--depth);
   overflow: hidden;
-  will-change: border-color, box-shadow;
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: radial-gradient(
-      320px circle at var(--mouse-x, -999px) var(--mouse-y, -999px),
-      rgba(255, 138, 0, 0.22),
-      rgba(255, 100, 0, 0.06) 45%,
-      transparent 80%
-    );
-    opacity: var(--spotlight-opacity, 0);
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-    z-index: 0;
-  }
-}
-
-.feedbackCard:hover {
-  border-color: var(--border-strong);
 }
 
 .FeedbackMsg {

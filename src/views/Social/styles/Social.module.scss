@@ -179,11 +179,6 @@
     width: 100%;
     height: auto;
     border-radius: 8px;
-    transition: transform 0.3s ease-in-out;
-  }
-  
-  .post img:hover, .middleColumn img:hover, .rightColumn img:hover {
-    transform: scale(1.05);
   }
 
 
@@ -340,11 +335,6 @@
       width: 100%;
       height: auto;
       border-radius: 8px;
-      transition: transform 0.3s ease-in-out;
-    }
-    
-    .post img:hover, .middleColumn img:hover, .rightColumn img:hover {
-      transform: scale(1.05);
     }
   
 }
@@ -404,11 +394,6 @@
   .linkedinfeed {
     max-width: 600px;
     margin-left: 1.5rem;
-  }
-
-
-  .post img:hover, .middleColumn img:hover, .rightColumn img:hover {
-    transform: scale(1.05);
   }
 
 
@@ -590,11 +575,6 @@
   .linkedinfeed {
     max-width: 600px;
     margin-left: 1.5rem;
-  }
-
-
-  .post img:hover, .middleColumn img:hover, .rightColumn img:hover {
-    transform: scale(1.05);
   }
 
 

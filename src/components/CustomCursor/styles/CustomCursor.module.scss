@@ -8,14 +8,12 @@
   margin-left: -4px;
   border-radius: 50%;
   background: var(--primary, #ff8a00);
-  box-shadow: 0 0 10px rgba(255, 138, 0, 0.9), 0 0 20px rgba(255, 138, 0, 0.5);
   pointer-events: none;
   z-index: 99999;
   will-change: transform;
-  transition: transform 0.15s ease, opacity 0.3s ease;
+  transition: opacity 0.3s ease;
 
   &.hovered {
-    transform: scale(1.6);
     background: #ffa826;
   }
 
@@ -38,16 +36,14 @@
   pointer-events: none;
   z-index: 99998;
   will-change: transform;
-  transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease, border-color 0.25s ease, background-color 0.25s ease, opacity 0.3s ease;
+  transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease, background-color 0.25s ease, opacity 0.3s ease;
 
   &.hovered {
     width: 52px;
     height: 52px;
     margin-top: -26px;
     margin-left: -26px;
-    border-color: rgba(255, 138, 0, 0.95);
     background: rgba(255, 138, 0, 0.14);
-    box-shadow: 0 0 20px rgba(255, 138, 0, 0.3);
   }
 
   &.hidden {

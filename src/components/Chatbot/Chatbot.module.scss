@@ -118,37 +118,7 @@ $border-radius-medium: 16px;
     backdrop-filter: blur($glass-blur);
 
     &:hover {
-        transform: scale(1.1);
         animation: none;
-        box-shadow: 0 12px 32px rgba(244, 43, 3, 0.5);
-    }
-
-    &:active {
-        transform: scale(0.95);
-    }
-}
-
-.pulseRing {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 3px solid rgba(255, 190, 11, 0.6);
-    animation: pulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulseRing {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translate(-50%, -50%) scale(1.5);
-        opacity: 0;
     }
 }
 
@@ -292,7 +262,6 @@ $border-radius-medium: 16px;
     }
 
     &:active {
-        transform: scale(0.95);
     }
 }
 
@@ -393,7 +362,7 @@ $border-radius-medium: 16px;
     cursor: default;
 
     &:hover {
-        transform: translateY(-2px) scale(1.01);
+        transform: translateY(-2px);
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     }
 }
@@ -403,21 +372,13 @@ $border-radius-medium: 16px;
     color: #1a1a1a;
     border-bottom-right-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
 }
 
 .botMessage {
     background: $primary-gradient;
     color: $light-text;
     border-bottom-left-radius: 4px;
-    box-shadow: 0 2px 8px rgba(244, 43, 3, 0.2);
-
-    &:hover {
-        box-shadow: 0 8px 24px rgba(255, 140, 40, 0.35);
-    }
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
     // Style bullet lists inside bot messages
     ul {
@@ -532,9 +493,7 @@ $border-radius-medium: 16px;
 
     &:hover {
         background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 190, 11, 0.5);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 190, 11, 0.2);
     }
 
     &:active {
@@ -583,8 +542,6 @@ $border-radius-medium: 16px;
     &:focus {
         outline: none;
         background: rgba(255, 255, 255, 0.12);
-        border-color: #ff5500;
-        box-shadow: 0 0 0 3px rgba(255, 85, 0, 0.25);
     }
 }
 
@@ -607,7 +564,6 @@ $border-radius-medium: 16px;
 
     &:hover {
         background: rgba(255, 255, 255, 0.16);
-        border-color: rgba(255, 255, 255, 0.25);
     }
 
     &:active {
@@ -617,8 +573,6 @@ $border-radius-medium: 16px;
     &.listening {
         background: linear-gradient(135deg, #ff5500 0%, #ff8a00 100%);
         border-color: transparent;
-        animation: pulse 1.5s ease-in-out infinite;
-        box-shadow: 0 0 20px rgba(255, 85, 0, 0.5);
     }
 }
 
@@ -638,11 +592,10 @@ $border-radius-medium: 16px;
     color: #ffffff;
     box-sizing: border-box;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 14px rgba(255, 85, 0, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 
     &:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(255, 85, 0, 0.5);
     }
 
     &:active:not(:disabled) {

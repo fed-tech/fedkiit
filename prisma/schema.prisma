@@ -203,6 +203,8 @@ model attendance {
   markedAt DateTime?
 
   @@unique([formId, userId, teamCode])
+  @@index([formId])
+  @@index([formId, isPresent])
   @@map("attendance")
 }
 

@@ -21,11 +21,17 @@ import socialLinks from '../../data/SocialLink.json';
 // `{ ssr: false }` is written out at both call sites on purpose: next/dynamic is
 // a compile-time transform and rejects a shared options variable.
 const InstagramEmbed = dynamic(
-  () => import('react-social-media-embed').then((m) => m.InstagramEmbed),
+  () =>
+    import('react-social-media-embed/dist/components/embeds/InstagramEmbed').then(
+      (m) => m.InstagramEmbed,
+    ),
   { ssr: false },
 );
 const LinkedInEmbed = dynamic(
-  () => import('react-social-media-embed').then((m) => m.LinkedInEmbed),
+  () =>
+    import('react-social-media-embed/dist/components/embeds/LinkedInEmbed').then(
+      (m) => m.LinkedInEmbed,
+    ),
   { ssr: false },
 );
 

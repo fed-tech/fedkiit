@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useCallback,
+} from "react";
+import { Html5Qrcode } from "html5-qrcode";
 import { EventCard } from "../../components";
 import { Button } from "../../components/Core";
 import AuthContext from "../../context/AuthContext";
@@ -8,8 +15,34 @@ import { api } from "../../services";
 import styles from "./styles/AttendancePage.module.scss";
 import { IoClose } from "react-icons/io5";
 import { FaDownload } from "react-icons/fa";
-import { Alert, ComponentLoading } from "../../microInteraction";
-import { Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
+import { showAlert, ComponentLoading } from "../../microInteraction";
+
+const STATS_POLL_MS = 15000;
+const API_TIMEOUT_MS = 15000;
+
+function sortEvents(events) {
+  return [...events].sort((a, b) => {
+    const priorityA = parseInt(a.info?.eventPriority ?? "99", 10);
+    const priorityB = parseInt(b.info?.eventPriority ?? "99", 10);
+    const dateA = new Date(a.info?.eventDate ?? 0);
+    const dateB = new Date(b.info?.eventDate ?? 0);
+    const titleA = a.info?.eventTitle || "";
+    const titleB = b.info?.eventTitle || "";
+
+    if (priorityA !== priorityB) return priorityA - priorityB;
+    if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
+    return titleA.localeCompare(titleB);
+  });
+}
+
+function errorCode(error) {
+  const errors = error?.response?.data?.errors;
+  return Array.isArray(errors) ? errors[0]?.code : undefined;
+}
+
+function isNetworkError(error) {
+  return !error?.response && Boolean(error?.message);
+}
 
 const AttendancePage = () => {
   const [ongoingEvents, setOngoingEvents] = useState([]);
@@ -18,43 +51,67 @@ const AttendancePage = () => {
   const [error, setError] = useState(null);
   const [showScanner, setShowScanner] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState(null);
-  const [scanner, setScanner] = useState(null);
+  const [selectedEventTitle, setSelectedEventTitle] = useState("");
   const [isScanning, setIsScanning] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [attendedUser, setAttendedUser] = useState(null);
-  const [hasShownAlert, setHasShownAlert] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [eventStats, setEventStats] = useState({ registered: 0, present: 0 });
+
   const authCtx = useContext(AuthContext);
   const processingRef = useRef(false);
+  const closingRef = useRef(false);
+  const html5QrRef = useRef(null);
+  const selectedEventIdRef = useRef(null);
+  const showScannerRef = useRef(false);
+  const authTokenRef = useRef(authCtx.token);
+
+  authTokenRef.current = authCtx.token;
+  selectedEventIdRef.current = selectedEventId;
+  showScannerRef.current = showScanner;
+
+  const authHeaders = useCallback(
+    () => ({ Authorization: `Bearer ${authTokenRef.current}` }),
+    [],
+  );
+
+  const fetchEventStats = useCallback(
+    async (eventId) => {
+      if (!eventId) return;
+      try {
+        const response = await api.get(`/api/form/attendance-stats/${eventId}`, {
+          headers: authHeaders(),
+          timeout: API_TIMEOUT_MS,
+        });
+        if (response.status === 200) {
+          setEventStats({
+            registered: response.data.registered ?? 0,
+            present: response.data.present ?? 0,
+          });
+        }
+      } catch {
+        // Non-blocking.
+      }
+    },
+    [authHeaders],
+  );
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await api.get("/api/form/getAllForms");
+        const response = await api.get("/api/form/attendance-events", {
+          headers: authHeaders(),
+          timeout: API_TIMEOUT_MS,
+        });
         if (response.status === 200) {
-          const fetchedEvents = response.data.events;
-
-          // sort events by priority, date, and title
-          const sortedEvents = fetchedEvents.sort((a, b) => {
-            const priorityA = parseInt(a.info.eventPriority, 10);
-            const priorityB = parseInt(b.info.eventPriority, 10);
-            const dateA = new Date(a.info.eventDate);
-            const dateB = new Date(b.info.eventDate);
-            const titleA = a.info.eventTitle || "";
-            const titleB = b.info.eventTitle || "";
-
-            if (priorityA !== priorityB) return priorityA - priorityB;
-            if (dateA.getTime() !== dateB.getTime()) return dateA - dateB;
-            return titleA.localeCompare(titleB);
-          });
-
-          const ongoing = sortedEvents.filter(e => !e.info.isEventPast);
-          const past = sortedEvents
-            .filter(e => e.info.isEventPast)
-            .sort((a, b) => new Date(b.info.eventDate) - new Date(a.info.eventDate));
-
-          setOngoingEvents(ongoing);
-          setPastEvents(past);
+          const sorted = sortEvents(response.data.events ?? []);
+          setOngoingEvents(sorted.filter((e) => !e.info?.isEventPast));
+          setPastEvents(
+            sorted
+              .filter((e) => e.info?.isEventPast)
+              .sort(
+                (a, b) =>
+                  new Date(b.info?.eventDate ?? 0) -
+                  new Date(a.info?.eventDate ?? 0),
+              ),
+          );
         } else {
           setError("Error fetching events");
         }
@@ -66,181 +123,220 @@ const AttendancePage = () => {
       }
     };
     fetchEvents();
-  }, []);
+  }, [authHeaders]);
 
-  const initializeScanner = () => {
+  const pauseScanner = async () => {
+    const scanner = html5QrRef.current;
+    if (!scanner?.isScanning) return;
     try {
-      const qrScanner = new Html5QrcodeScanner(
-        "qr-reader",
-        {
-          fps: 10,
-          qrbox: { width: 250, height: 250 },
-          aspectRatio: 1,
-          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
-        },
-        false
-      );
-
-      qrScanner.render(onScanSuccess, onScanFailure);
-      setScanner(qrScanner);
-    } catch (error) {
-      console.error("Error initializing scanner:", error);
-      if (!hasShownAlert) {
-        Alert({
-          type: "error",
-          message: "Failed to initialize QR scanner",
-          position: "top-right",
-        });
-        setHasShownAlert(true);
-      }
-      setShowScanner(false);
+      await scanner.pause(true);
+    } catch {
+      // Some browsers reject pause; processingRef still guards duplicates.
     }
   };
 
+  const resumeScanner = async () => {
+    if (!showScannerRef.current || closingRef.current) return;
+    const scanner = html5QrRef.current;
+    if (!scanner?.isScanning) return;
+    try {
+      await scanner.resume();
+    } catch {
+      // Ignore resume failures; admin can close and reopen.
+    }
+  };
+
+  const stopScanner = useCallback(async () => {
+    const scanner = html5QrRef.current;
+    if (!scanner) return;
+    html5QrRef.current = null;
+    try {
+      if (scanner.isScanning) await scanner.stop();
+      scanner.clear();
+    } catch (err) {
+      console.warn("Scanner stop:", err);
+    }
+  }, []);
+
+  const closeScanner = useCallback(async () => {
+    closingRef.current = true;
+    await stopScanner();
+    setShowScanner(false);
+    setSelectedEventId(null);
+    setSelectedEventTitle("");
+    closingRef.current = false;
+  }, [stopScanner]);
+
   const onScanSuccess = async (decodedText) => {
-    if (processingRef.current) return;
+    const token = decodedText?.trim();
+    const eventId = selectedEventIdRef.current;
+
+    if (!token || processingRef.current || closingRef.current || !eventId) return;
+
     processingRef.current = true;
     setIsScanning(true);
-    console.log("QR Code scanned successfully:", decodedText);
-    console.log("Selected Event ID:", selectedEventId);
-    
+    await pauseScanner();
+
     try {
-      // jwt token from qr code
       const response = await api.post(
-        `/api/form/markAttendance`,
-        {
-          formId: selectedEventId,
-          token: decodedText,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${authCtx.token}`,
-          },
-        }
+        "/api/form/markAttendance",
+        { formId: eventId, token },
+        { headers: authHeaders(), timeout: API_TIMEOUT_MS },
       );
 
-      if (response.status === 200) {
-        // A 200 only ever means "newly marked". A second scan of the same QR
-        // comes back as 400 "Attendance already marked." and is handled in the
-        // catch below — the API has no success-with-a-flag form.
-        //
-        // The response is `{ message, attendance }`; there is no `user` key, so
-        // this keeps the whole body. The success modal only checks that it is
-        // truthy.
-        setAttendedUser(response.data.user || response.data);
-        setIsSuccess(true);
-        if (scanner) {
-          scanner.clear();
-        }
-        setShowSuccessModal(true);
-        setIsScanning(false);
-        
-        // show success alert
-        Alert({
-          type: "success",
-          message: "Attendance marked successfully!",
-          position: "top-right",
-        });
-        
-        return; // exit early
-      }
-    } catch (error) {
-      console.error("Error marking attendance:", error);
+      const { alreadyMarked } = response.data ?? {};
 
-      // "Already marked" is the expected outcome of scanning the same QR twice,
-      // not a failure — the volunteer at the door needs to know the person is
-      // already through, not see a red error. The API signals it exactly as the
-      // Express controller does (markAttendance.js:154): a 400 carrying this
-      // message, with no machine-readable code to key off, so the message is
-      // what has to be matched.
-      const apiMessage = error.response?.data?.message;
-      if (
-        error.response?.status === 400 &&
-        typeof apiMessage === "string" &&
-        apiMessage.toLowerCase().includes("already marked")
-      ) {
-        if (scanner) {
-          try {
-            scanner.clear();
-          } catch (clearError) {
-            console.error("Error clearing scanner:", clearError);
-          }
-        }
-        setShowScanner(false);
-        setScanner(null);
-        Alert({
+      if (alreadyMarked) {
+        showAlert({
           type: "info",
-          message: apiMessage,
+          id: "attendance-already-checked-in",
+          message: "Already checked in",
           position: "top-right",
+          duration: 3000,
         });
+        await fetchEventStats(eventId);
+        await resumeScanner();
         return;
       }
 
-      let errorMessage = "Failed to verify QR code";
+      await fetchEventStats(eventId);
+      showAlert({
+        type: "success",
+        id: "attendance-marked-success",
+        message: "Attendance marked successfully!",
+        position: "top-right",
+        duration: 3000,
+      });
+      await closeScanner();
+    } catch (err) {
+      console.error("Error marking attendance:", err);
+      const code = errorCode(err);
+      const apiMessage = err.response?.data?.message;
+      let errorMessage = apiMessage || "Failed to verify QR code";
 
-      if (error.response?.status === 401) {
-        // 401 covers two different things: a bad or expired QR ("Invalid or
-        // expired QR.") and the *scanner's* own session having lapsed ("Token
-        // is required"). Showing the API's wording keeps a signed-out volunteer
-        // from blaming the participant's QR code.
+      if (isNetworkError(err)) {
+        errorMessage = "Network error — check your connection and try again";
+      } else if (err.response?.status === 401) {
+        if (apiMessage === "Token is required") {
+          errorMessage = "Your session expired — please log in again";
+          await closeScanner();
+          showAlert({ type: "error", message: errorMessage, position: "top-right" });
+          return;
+        }
         errorMessage = apiMessage || "Invalid or expired QR code";
-      } else if (error.response?.status === 400) {
-        errorMessage = error.response?.data?.message || "Invalid request";
-      } else if (error.response?.status === 404) {
-        errorMessage = "Attendance record not found";
-      } else if (error.response?.status === 403) {
+      } else if (code === "INVALID_QR") {
+        errorMessage = "Invalid or expired QR code";
+      } else if (code === "WRONG_EVENT") {
+        errorMessage = "This QR belongs to a different event";
+      } else if (code === "CONFLICT") {
+        errorMessage = "Could not mark attendance — scan again";
+      } else if (err.response?.status === 403) {
         errorMessage = "You don't have permission to mark attendance";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
+      } else if (err.response?.status === 404) {
+        errorMessage = "Attendance record not found";
       }
-      
-      // show error alert
-      if (!hasShownAlert) {
-        Alert({
-          type: "error",
-          message: errorMessage,
-          position: "top-right",
-        });
-        setHasShownAlert(true);
-      }
+
+      showAlert({
+        type: "error",
+        id: `attendance-scan-error-${code || err.response?.status || "network"}`,
+        message: errorMessage,
+        position: "top-right",
+      });
+      await resumeScanner();
     } finally {
       setIsScanning(false);
       processingRef.current = false;
     }
   };
 
-  const onScanFailure = (error) => {
-    console.warn(`QR Code scanning failed: ${error}`);
-  };
+  const onScanFailure = () => {};
 
-  const handleScanQR = (eventId) => {
-    setSelectedEventId(eventId);
-    setShowScanner(true);
-    setHasShownAlert(false); // reset alert state
-    setIsSuccess(false); // reset success state
+  const onScanSuccessRef = useRef(onScanSuccess);
+  onScanSuccessRef.current = onScanSuccess;
+
+  const startScanner = useCallback(async () => {
+    if (html5QrRef.current || closingRef.current) return;
+    if (!document.getElementById("qr-reader")) return;
+
+    try {
+      const html5Qr = new Html5Qrcode("qr-reader", { verbose: false });
+      html5QrRef.current = html5Qr;
+      await html5Qr.start(
+        { facingMode: "environment" },
+        {
+          fps: 10,
+          qrbox: { width: 260, height: 260 },
+          aspectRatio: 1,
+          disableFlip: false,
+        },
+        (text) => onScanSuccessRef.current(text),
+        onScanFailure,
+      );
+    } catch (err) {
+      console.error("Error initializing scanner:", err);
+      showAlert({
+        type: "error",
+        message: "Could not access the camera. Check permissions and retry.",
+        position: "top-right",
+      });
+      setShowScanner(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!showScanner) {
+      stopScanner();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      startScanner();
+      fetchEventStats(selectedEventId);
+    }, 200);
+
+    const statsInterval = setInterval(() => {
+      fetchEventStats(selectedEventId);
+    }, STATS_POLL_MS);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(statsInterval);
+      stopScanner();
+    };
+  }, [showScanner, selectedEventId, startScanner, stopScanner, fetchEventStats]);
+
+  useEffect(() => {
+    return () => {
+      stopScanner();
+    };
+  }, [stopScanner]);
+
+  const handleScanQR = (event) => {
+    if (!authTokenRef.current) {
+      showAlert({
+        type: "error",
+        message: "Please log in to mark attendance",
+        position: "top-right",
+      });
+      return;
+    }
+
+    closingRef.current = false;
     processingRef.current = false;
+    setSelectedEventId(event.id);
+    setSelectedEventTitle(event.info?.eventTitle || "Event");
+    setEventStats({ registered: 0, present: 0 });
+    setShowScanner(true);
   };
-
-  const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    setAttendedUser(null);
-    // auto open scanner for next scan
-    setTimeout(() => {
-      setShowScanner(true);
-      setHasShownAlert(false); // reset alert state
-      setIsSuccess(false); // reset success state
-    }, 100);
-  };
-
-
 
   const handleDownloadAttendance = async (eventId) => {
     try {
-      const response = await api.get(`/api/form/export-attendance/${eventId}?format=xlsx`, {
-        headers: { Authorization: `Bearer ${authCtx.token}` },
+      const response = await api.get(`/api/form/export-attendance/${eventId}`, {
+        headers: authHeaders(),
         responseType: "blob",
+        timeout: API_TIMEOUT_MS,
       });
-      const blob = new Blob([response.data], { type: "text/xlsx" });
+      const blob = new Blob([response.data], { type: "text/csv;charset=utf-8" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -250,38 +346,29 @@ const AttendancePage = () => {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      Alert({
+      showAlert({
         type: "success",
-        message: "Attendance file downloaded successfully!",
+        message: "Attendance file downloaded",
         position: "top-right",
       });
-    } catch (error) {
+    } catch (err) {
       let errorMessage = "Failed to download attendance file";
-      
-      if (error.response?.status === 403) {
+      if (isNetworkError(err)) {
+        errorMessage = "Network error — could not download file";
+      } else if (err.response?.status === 403) {
         errorMessage = "You don't have permission to download attendance data";
-      } else if (error.response?.status === 404) {
+      } else if (err.response?.status === 404) {
         errorMessage = "Attendance data not found for this event";
-      } else if (error.response?.data?.message) {
-        errorMessage = error.response.data.message;
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
       }
-      
-      // show error alert
-      if (!isSuccess && !hasShownAlert) {
-        Alert({
-          type: "error",
-          message: errorMessage,
-          position: "top-right",
-        });
-        setHasShownAlert(true);
-      }
-      console.error("Download error:", error);
+      showAlert({ type: "error", message: errorMessage, position: "top-right" });
     }
   };
 
   const renderOngoingActions = (event) => (
     <div className={styles.actionButtons}>
-      <Button onClick={() => handleScanQR(event.id)} variant="primary">
+      <Button onClick={() => handleScanQR(event)} variant="primary">
         Scan QR
       </Button>
       <Button
@@ -298,7 +385,6 @@ const AttendancePage = () => {
         <FaDownload size={18} />
         Attendance
       </Button>
-
     </div>
   );
 
@@ -310,25 +396,10 @@ const AttendancePage = () => {
         style={{ padding: "8px 16px", backgroundColor: "rgba(255, 138, 0, 0.9)" }}
       >
         <FaDownload size={18} />
-         Attendance
+        Attendance
       </Button>
     </div>
   );
-
-  useEffect(() => {
-    if (showScanner) {
-      initializeScanner();
-    }
-    return () => {
-      if (scanner) {
-        try {
-          scanner.clear();
-        } catch (error) {
-          console.error("Error clearing scanner in cleanup:", error);
-        }
-      }
-    };
-  }, [showScanner]);
 
   if (isLoading) {
     return (
@@ -347,7 +418,7 @@ const AttendancePage = () => {
   }
 
   if (error) {
-    return <div>{error}</div>;
+    return <div className={styles.errorState}>{error}</div>;
   }
 
   return (
@@ -358,63 +429,29 @@ const AttendancePage = () => {
         <div className={styles.scannerModal}>
           <div className={styles.scannerContent}>
             <button
+              type="button"
               className={styles.closeButton}
-              onClick={() => {
-                if (scanner) {
-                  try {
-                    scanner.clear();
-                  } catch (error) {
-                    console.error("Error clearing scanner:", error);
-                  }
-                }
-                setShowScanner(false);
-                setScanner(null);
-              }}
+              onClick={closeScanner}
+              aria-label="Close scanner"
             >
               <IoClose />
             </button>
-            <h3 className={styles.scannerTitle}>Scan QR Code</h3>
+            <h3 className={styles.scannerTitle}>{selectedEventTitle}</h3>
+            <p className={styles.scannerStats}>
+              Checked in: {eventStats.present} / {eventStats.registered}
+            </p>
             <div className={styles.scannerArea}>
               {isScanning && (
                 <div className={styles.scanningOverlay}>
-                  <div className={styles.scanningText}>Processing QR Code...</div>
+                  <div className={styles.scanningText}>Verifying…</div>
                 </div>
               )}
-              <div id="qr-reader"></div>
+              <div id="qr-reader" />
             </div>
           </div>
         </div>
       )}
 
-      {/* Success Modal */}
-      {showSuccessModal && attendedUser && (
-        <div className={styles.scannerModal}>
-          <div className={styles.scannerContent}>
-            <button
-              className={styles.closeButton}
-              onClick={handleCloseSuccessModal}
-            >
-              <IoClose />
-            </button>
-            <div className={styles.successContent}>
-              <div className={styles.successIcon}>✓</div>
-              <h3 className={styles.successTitle}>Attendance Marked Successfully!</h3>
-              
-              <div className={styles.buttonGroup}>
-                <Button 
-                  onClick={handleCloseSuccessModal} 
-                  variant="primary"
-                  style={{ padding: "10px 20px" }}
-                >
-                  OK
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Ongoing Events */}
       {ongoingEvents.length > 0 && (
         <>
           <h3>Ongoing Events</h3>
@@ -428,7 +465,7 @@ const AttendancePage = () => {
                   showRegisterButton={false}
                   showShareButton={false}
                   additionalContent={renderOngoingActions(event)}
-                  onOpen={() => { }} // fixed
+                  onOpen={() => {}}
                   customStyles={{
                     eventname: { fontSize: "1.2rem" },
                     registerbtn: { width: "8rem", fontSize: ".721rem" },
@@ -441,7 +478,6 @@ const AttendancePage = () => {
         </>
       )}
 
-      {/* Past Events */}
       {pastEvents.length > 0 && (
         <>
           <h3 style={{ marginTop: "2rem" }}>Past Events</h3>
@@ -455,7 +491,7 @@ const AttendancePage = () => {
                   showRegisterButton={false}
                   showShareButton={false}
                   additionalContent={renderPastActions(event)}
-                  onOpen={() => { }} // fixed
+                  onOpen={() => {}}
                   customStyles={{
                     eventname: { fontSize: "1.2rem" },
                     registerbtn: { width: "8rem", fontSize: ".721rem" },

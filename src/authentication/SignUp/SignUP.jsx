@@ -7,6 +7,7 @@ import { useContext, useState } from "react";
 import styles from "./style/Signup.module.scss";
 import { Input, Button, Text } from "../../components";
 import GoogleSignup from "./GoogleSignup";
+import { isGoogleOAuthEnabled } from "../../utils/googleOAuth";
 import bcrypt from "bcryptjs";
 import { useEffect } from "react";
 
@@ -315,18 +316,20 @@ const SignUp = () => {
               SignUp
             </h1>
             <GoogleSignup setAlert={setAlert} />
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "8 px 0 4px 0",
-              }}
-            >
-              <div />
-              <p style={{ color: "#fff", textAlign: "center" }}>or</p>
-              <div />
-            </div>
+            {isGoogleOAuthEnabled() ? (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  margin: "8 px 0 4px 0",
+                }}
+              >
+                <div />
+                <p style={{ color: "#fff", textAlign: "center" }}>or</p>
+                <div />
+              </div>
+            ) : null}
             <form onSubmit={handleSignUp}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <div style={{ width: "48%" }}>

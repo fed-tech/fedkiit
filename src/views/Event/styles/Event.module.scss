@@ -336,74 +336,50 @@
   }
 }
 
-/* ---------------------------------------------------------------- skeleton */
+/* -------------------------------------------------------- loading chrome */
 
-.skeleton {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background-color: var(--surface-1);
-  overflow: hidden;
-  animation: pulse 1.6s var(--ease) infinite;
-}
-
-.skeletonMedia {
-  aspect-ratio: 16 / 9;
+.skeletonCountdown {
+  display: inline-flex;
+  width: 5.5rem;
+  height: 24px;
+  border-radius: var(--radius-pill);
   background-color: var(--surface-3);
+  animation: pageSkeletonPulse 1.6s var(--ease) infinite;
 }
 
-.skeletonBody {
-  display: flex;
-  flex-direction: column;
+.skeletonGroupToggle {
+  display: inline-flex;
+  align-items: center;
   gap: 10px;
-  padding: 18px;
+  padding: 6px 12px 6px 8px;
+  margin-left: -8px;
 }
 
-.skeletonLine {
-  display: block;
+.skeletonChevron {
+  width: 15px;
+  height: 15px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-3);
+  animation: pageSkeletonPulse 1.6s var(--ease) infinite;
+}
+
+.skeletonGroupLabel {
+  width: 4.75rem;
   height: 12px;
   border-radius: var(--radius-sm);
   background-color: var(--surface-3);
+  animation: pageSkeletonPulse 1.6s var(--ease) infinite;
 }
 
-.skeletonCta {
-  display: block;
-  width: 10rem;
-  height: 2.5rem;
-  margin-top: 0.75rem;
+.skeletonGroupCount {
+  width: 22px;
+  height: 22px;
   border-radius: var(--radius-pill);
   background-color: var(--surface-3);
+  animation: pageSkeletonPulse 1.6s var(--ease) infinite;
 }
 
-.skeletonFeatured {
-  max-width: 100%;
-}
-
-@media (min-width: 900px) {
-  .skeletonFeatured {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    min-height: 430px;
-  }
-
-  .skeletonFeatured .skeletonMedia {
-    aspect-ratio: auto;
-    min-height: 430px;
-    height: 100%;
-    border-right: 1px solid var(--border);
-  }
-
-  .skeletonFeatured .skeletonBody {
-    justify-content: center;
-    gap: 12px;
-    padding: 28px;
-  }
-
-  .skeletonFeatured .skeletonLine:nth-child(2) {
-    height: 22px;
-  }
-}
-
-@keyframes pulse {
+@keyframes pageSkeletonPulse {
   0%,
   100% {
     opacity: 1;

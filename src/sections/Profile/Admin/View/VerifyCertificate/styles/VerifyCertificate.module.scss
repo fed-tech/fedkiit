@@ -58,9 +58,6 @@ $shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     border: 2px solid $accent-color;
     transition: transform 0.3s;
 
-    &:hover {
-      transform: scale(1.02);
-    }
     @media(max-width: 390px) {
       padding: 0.1rem;
       width: 85%;
@@ -153,7 +150,6 @@ $shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 
     &:hover {
       background-color: color.adjust($accent-color, $lightness: -10%);
-      transform: scale(1.05);
     }
   }
 
@@ -186,11 +182,6 @@ $shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     width: 32px;
     height: 32px;
     cursor: pointer;
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: scale(1.1);
-    }
   }
 }
 .actionButtons{
@@ -208,6 +199,5 @@ $shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 
   &:hover {
     background-color: color.adjust($accent-color, $lightness: -10%);
-    transform: scale(1.05);
   }
 }

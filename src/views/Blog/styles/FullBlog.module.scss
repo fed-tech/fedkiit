@@ -143,7 +143,7 @@ $card-radius: 16px;
     transition: transform 0.2s;
 
     &:hover {
-      transform: translateY(-3px) scale(1.02);
+      transform: translateY(-3px);
     }
 
     img {
@@ -258,11 +258,6 @@ $card-radius: 16px;
   border: none;
   border-radius: 50px;
   cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.05);
-  }
 }
 
 // Responsive Padding

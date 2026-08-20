@@ -493,6 +493,8 @@ $poster-stretch: 1.19;
 /* ---------------------------------------------------------------- skeleton */
 
 .skeleton {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -502,15 +504,35 @@ $poster-stretch: 1.19;
 }
 
 .skeletonMedia {
+  position: relative;
   aspect-ratio: 16 / 9;
+  flex-shrink: 0;
   background-color: var(--surface-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.skeletonBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 3.5rem;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-2);
+}
+
+.skeletonMain {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 }
 
 .skeletonBody {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 10px;
-  padding: 18px;
+  padding: 14px 14px 0;
 }
 
 .skeletonLine {
@@ -520,44 +542,102 @@ $poster-stretch: 1.19;
   background-color: var(--surface-3);
 }
 
+.skeletonMeta {
+  width: 58%;
+  height: 10px;
+}
+
+.skeletonTitle {
+  width: 78%;
+  height: 16px;
+}
+
+.skeletonFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+}
+
 .skeletonCta {
   display: block;
-  width: 10rem;
-  height: 2.5rem;
-  margin-top: 0.75rem;
+  flex: 1;
+  min-height: 40px;
   border-radius: var(--radius-pill);
   background-color: var(--surface-3);
 }
 
-// Mirror the real featured card so the placeholder does not jump when content
-// swaps in - tall full-width 16:9 media was the layout shift.
+.skeletonTool {
+  display: block;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-3);
+}
+
 .skeletonFeatured {
   max-width: 100%;
+}
+
+.skeletonFeatured .skeletonMedia {
+  aspect-ratio: auto;
+  height: clamp(190px, 30vh, 340px);
+}
+
+.skeletonFeatured .skeletonTitle {
+  height: 24px;
+  width: 72%;
 }
 
 @media (min-width: 900px) {
   .skeletonFeatured {
     display: grid;
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    min-height: 430px;
-    height: auto;
+    grid-template-rows: 1fr auto;
+    min-height: clamp(320px, 46vh, 430px);
   }
 
   .skeletonFeatured .skeletonMedia {
-    aspect-ratio: auto;
-    min-height: 430px;
+    grid-row: 1 / -1;
     height: 100%;
+    min-height: 0;
+    border-bottom: 0;
     border-right: 1px solid var(--border);
   }
 
-  .skeletonFeatured .skeletonBody {
+  .skeletonFeatured .skeletonMain {
+    grid-column: 2;
+    grid-row: 1 / -1;
     justify-content: center;
-    gap: 12px;
-    padding: 28px;
   }
 
-  .skeletonFeatured .skeletonLine:nth-child(2) {
-    height: 22px;
+  .skeletonFeatured .skeletonBody {
+    gap: 12px;
+    padding: 28px 28px 0;
+    justify-content: center;
+  }
+
+  .skeletonFeatured .skeletonMeta {
+    width: 48%;
+  }
+
+  .skeletonFeatured .skeletonTitle {
+    height: 28px;
+    width: 64%;
+  }
+
+  .skeletonFeatured .skeletonFooter {
+    margin-top: 22px;
+    padding: 16px 28px 26px;
+    border-top: 0;
+  }
+
+  .skeletonFeatured .skeletonCta {
+    flex: 0 1 auto;
+    min-width: 180px;
   }
 }
 
@@ -577,6 +657,14 @@ $poster-stretch: 1.19;
   }
 
   .footer {
+    padding: 16px 20px;
+  }
+
+  .skeletonBody {
+    padding: 20px 20px 0;
+  }
+
+  .skeletonFooter {
     padding: 16px 20px;
   }
 }

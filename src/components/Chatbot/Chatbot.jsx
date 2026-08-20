@@ -380,7 +380,6 @@ const Chatbot = () => {
                     aria-label="Open Chat"
                 >
                     <BiSolidMessageSquareDetail size={38} />
-                    <div className={styles.pulseRing}></div>
                 </button>
             )}
 

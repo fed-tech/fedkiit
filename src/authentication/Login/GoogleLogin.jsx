@@ -4,15 +4,15 @@ import { useContext, useState, useEffect } from "react";
 
 import style from "../SignUp/style/Signup.module.scss";
 import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import AuthContext, { SESSION_TTL_MS } from "../../context/AuthContext";
 import google from "../../assets/images/google.png";
 import { Alert, MicroLoading } from "../../microInteraction";
 import { api } from "../../services";
 import { useRouter } from "next/navigation";
 import postAuthRedirect from "../../utils/postAuthRedirect";
+import { isGoogleOAuthEnabled } from "../../utils/googleOAuth";
 
-export default function GoogleLogin() {
+function GoogleLoginButton() {
   const [alert, setAlert] = useState(null);
   const [codeResponse, setCodeResponse] = useState(null);
   const [shouldNavigate, setShouldNavigate] = useState(false);
@@ -22,7 +22,7 @@ export default function GoogleLogin() {
   const [isLoading, setIsLoading] = useState(false);
 
   const login = useGoogleLogin({
-    onSuccess: (codeResponse) => setCodeResponse(codeResponse),
+    onSuccess: (response) => setCodeResponse(response),
     onError: (error) => console.error("Login failed:", error),
   });
 
@@ -40,7 +40,6 @@ export default function GoogleLogin() {
     }
   }, [alert]);
 
-  // `replace`, not `push`: App.jsx redirected with <Navigate replace />.
   useEffect(() => {
     if (shouldNavigate) {
       router.replace(navigatePath);
@@ -57,8 +56,6 @@ export default function GoogleLogin() {
         });
 
         if (response.status === 200 || response.status === 201) {
-          // User exists in the backend
-          // console.log(response);
           const user = response.data.user;
 
           setAlert({
@@ -89,18 +86,10 @@ export default function GoogleLogin() {
               user.regForm,
               user.blurhash,
               response.data.token,
-              SESSION_TTL_MS
+              SESSION_TTL_MS,
             );
-            // App.jsx re-rendered /Login as <LoginRedirect /> once isLoggedIn
-            // flipped; nothing watches that flag under the App Router, so the
-            // navigation this component was already wired for is triggered here.
             setShouldNavigate(true);
           }, 800);
-
-        } else {
-
-          // console.log("Unexpected backend response status:", response.status);
-          // handleFallbackOrSignup(googleUserData);
         }
       } catch (error) {
         setAlert({
@@ -111,7 +100,6 @@ export default function GoogleLogin() {
         });
 
         console.error("Backend API call failed:", error);
-
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -129,6 +117,7 @@ export default function GoogleLogin() {
   return (
     <>
       <button
+        type="button"
         style={{
           backgroundColor: "transparent",
           color: "#fff",
@@ -141,7 +130,7 @@ export default function GoogleLogin() {
           alignItems: "center",
         }}
         className={style.google_btn}
-        onClick={login}
+        onClick={() => login()}
       >
         {isLoading ? (
           <MicroLoading />
@@ -163,4 +152,12 @@ export default function GoogleLogin() {
       <Alert />
     </>
   );
+}
+
+export default function GoogleLogin() {
+  if (!isGoogleOAuthEnabled()) {
+    return null;
+  }
+
+  return <GoogleLoginButton />;
 }

@@ -18,6 +18,33 @@ import { useRouter } from "next/navigation";
 import { isPrerequisiteMet } from "../../utils/prerequisite";
 import { cdn } from "../../utils/cloudinary";
 
+export function EventCardSkeleton({ variant = "default" }) {
+  const featured = variant === "featured";
+
+  return (
+    <div
+      className={`${style.skeleton} ${featured ? style.skeletonFeatured : ""}`}
+      aria-hidden="true"
+    >
+      <div className={style.skeletonMedia}>
+        <span className={style.skeletonBadge} />
+      </div>
+      <div className={style.skeletonMain}>
+        <div className={style.skeletonBody}>
+          <span className={`${style.skeletonLine} ${style.skeletonMeta}`} />
+          <span className={`${style.skeletonLine} ${style.skeletonTitle}`} />
+          <span className={style.skeletonLine} style={{ width: featured ? "82%" : "68%" }} />
+          <span className={style.skeletonLine} style={{ width: featured ? "64%" : "52%" }} />
+        </div>
+        <div className={style.skeletonFooter}>
+          <span className={style.skeletonCta} />
+          <span className={style.skeletonTool} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const EventCard = (props) => {
   const {
     data,
@@ -394,26 +421,7 @@ const EventCard = (props) => {
   };
 
   if (isLoading || showSkeleton) {
-    const featured = variant === "featured";
-    return (
-      <div
-        className={`${style.skeleton} ${featured ? style.skeletonFeatured : ""}`}
-        aria-hidden="true"
-      >
-        <div className={style.skeletonMedia} />
-        <div className={style.skeletonBody}>
-          <span className={style.skeletonLine} style={{ width: "35%" }} />
-          <span className={style.skeletonLine} style={{ width: featured ? "55%" : "80%" }} />
-          <span className={style.skeletonLine} style={{ width: featured ? "70%" : "60%" }} />
-          {featured && (
-            <>
-              <span className={style.skeletonLine} style={{ width: "90%" }} />
-              <span className={style.skeletonCta} />
-            </>
-          )}
-        </div>
-      </div>
-    );
+    return <EventCardSkeleton variant={variant} />;
   }
 
   return (
