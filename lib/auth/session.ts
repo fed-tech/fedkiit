@@ -1,6 +1,6 @@
 import "server-only";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 
 import { getEnv } from "@/lib/env";
@@ -61,11 +61,24 @@ export async function verifySessionToken(
 
 export async function setSessionCookie(token: string): Promise<void> {
   const cookieStore = await cookies();
+
+  // Match the request scheme: ngrok serves over HTTPS and many browsers refuse
+  // to persist a non-Secure cookie there, which breaks proxy.ts route guards
+  // even though localStorage still has the token.
+  let secure = process.env.NODE_ENV === "production";
+  try {
+    const headerList = await headers();
+    const proto = headerList.get("x-forwarded-proto")?.split(",")[0]?.trim();
+    if (proto) secure = proto === "https";
+  } catch {
+    // headers() is unavailable outside a request scope — keep the default.
+  }
+  if (process.env.SESSION_COOKIE_SECURE === "true") secure = true;
+  if (process.env.SESSION_COOKIE_SECURE === "false") secure = false;
+
   cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    // The old backend hardcoded `secure: true`, which silently breaks session
-    // cookies on http://localhost during development.
-    secure: process.env.NODE_ENV === "production",
+    secure,
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL_SECONDS,

@@ -16,6 +16,11 @@ import { api } from "../../services";
 import { Alert, MicroLoading, ComponentLoading } from "../../microInteraction";
 import Share from "../../features/Modals/Event/ShareModal/ShareModal";
 import { isPrerequisiteMet } from "../../utils/prerequisite";
+import {
+  batchRegistrationErrorMessage,
+  isBatchRegistrationBlocked,
+} from "../../utils/batchRestriction";
+import { MarkdownContent } from "../../components/Core";
 import style from "./styles/EventDetail.module.scss";
 
 /**
@@ -172,6 +177,11 @@ const EventDetail = () => {
       return;
     }
 
+    if (isBatchRegistrationBlocked(authCtx.user?.email)) {
+      setBtnTxt(info.isRegistrationClosed || info.isEventPast ? "Closed" : "Not Eligible");
+      return;
+    }
+
     setBtnTxt(openState());
   }, [
     authCtx.isLoggedIn,
@@ -197,6 +207,16 @@ const EventDetail = () => {
         message: "Team Members are not allowed to register for the Event",
         position: "bottom-right",
         duration: 3000,
+      });
+      return;
+    }
+
+    if (isBatchRegistrationBlocked(authCtx.user.email)) {
+      setAlert({
+        type: "info",
+        message: batchRegistrationErrorMessage(),
+        position: "bottom-right",
+        duration: 4000,
       });
       return;
     }
@@ -327,14 +347,7 @@ const EventDetail = () => {
 
           {info.eventdescription && (
             <div className={style.description}>
-              {String(info.eventdescription)
-                .split("\n")
-                .map((line, index) => (
-                  <React.Fragment key={index}>
-                    {line}
-                    <br />
-                  </React.Fragment>
-                ))}
+              <MarkdownContent>{String(info.eventdescription)}</MarkdownContent>
             </div>
           )}
 
@@ -358,6 +371,11 @@ const EventDetail = () => {
                   Locked
                   <IoIosLock aria-hidden="true" />
                 </>
+              ) : btnTxt === "Not Eligible" ? (
+                <>
+                  Not eligible
+                  <IoIosLock aria-hidden="true" />
+                </>
               ) : remainingTime && btnTxt === remainingTime ? (
                 <>
                   <PiClockCountdownDuotone aria-hidden="true" />
@@ -373,6 +391,9 @@ const EventDetail = () => {
                 This event unlocks once you have registered for its prerequisite
                 event.
               </p>
+            )}
+            {btnTxt === "Not Eligible" && (
+              <p className={style.hint}>{batchRegistrationErrorMessage()}</p>
             )}
           </div>
         </div>

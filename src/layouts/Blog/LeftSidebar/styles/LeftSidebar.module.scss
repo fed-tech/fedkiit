@@ -102,9 +102,6 @@
       color: white;
       transition: all 0.3s ease;
 
-      &:focus-within {
-        box-shadow: 0 0 10px rgba(244, 43, 3, 0.4);
-      }
     }
 
     :global(.select-control) {
@@ -154,14 +151,6 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     cursor: pointer;
     transition: all 0.3s ease;
-
-    &:hover {
-      transform: scale(1.1);
-    }
-
-    &:active {
-      transform: scale(0.95);
-    }
   }
 
   .leftSidebar.collapsed {

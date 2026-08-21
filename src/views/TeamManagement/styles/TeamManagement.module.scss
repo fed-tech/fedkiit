@@ -133,10 +133,6 @@
     outline: none;
     flex: 1;
     min-width: 0;
-
-    &:focus {
-        box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.3);
-    }
 }
 
 .editAction {
@@ -250,11 +246,6 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     padding: 1rem 1.25rem;
-    transition: border-color 0.2s;
-
-    &:hover {
-        border-color: rgba(255, 255, 255, 0.15);
-    }
 }
 
 .removeMemberButton {
@@ -273,7 +264,6 @@
 
     &:hover {
         background: rgba(255, 77, 77, 0.1);
-        transform: scale(1.1);
     }
 }
 
@@ -446,7 +436,6 @@
 
     &:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.15);
     }
 }
 
@@ -634,7 +623,6 @@
 
     &:hover {
         background: rgba(255, 77, 77, 0.1);
-        border-color: #ff4d4d;
         transform: translateY(-1px);
     }
 }
@@ -892,7 +880,6 @@
 
     &:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.15);
     }
 }
 
@@ -945,11 +932,6 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     padding: 1rem 1.25rem;
-    transition: border-color 0.2s;
-
-    &:hover {
-        border-color: rgba(255, 255, 255, 0.15);
-    }
 }
 
 .teamCardInfo {
@@ -1066,7 +1048,6 @@
 
     &:focus {
         border-color: var(--primary);
-        box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.15);
     }
 }
 

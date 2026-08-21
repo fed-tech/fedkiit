@@ -12,6 +12,7 @@ import { api } from "../../services";
 import AuthContext, { SESSION_TTL_MS } from "../../context/AuthContext";
 import { RecoveryContext } from "../../context/RecoveryContext";
 import GoogleLogin from "./GoogleLogin";
+import { isGoogleOAuthEnabled } from "../../utils/googleOAuth";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Alert, MicroLoading } from "../../microInteraction";
 import Link from "next/link";
@@ -167,26 +168,28 @@ const Login = () => {
             Login
           </h1>
           <GoogleLogin />
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "1rem",
-            }}
-          >
-            <div className={style.divider} />
-            <p
+          {isGoogleOAuthEnabled() ? (
+            <div
               style={{
-                color: "#fff",
-                textAlign: "center",
-                marginBottom: "0.2rem",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "1rem",
               }}
             >
-              or
-            </p>
-            <div className={style.divider} />
-          </div>
+              <div className={style.divider} />
+              <p
+                style={{
+                  color: "#fff",
+                  textAlign: "center",
+                  marginBottom: "0.2rem",
+                }}
+              >
+                or
+              </p>
+              <div className={style.divider} />
+            </div>
+          ) : null}
           <form className={style.form} onSubmit={handleLogin}>
             <Input
               type="text"

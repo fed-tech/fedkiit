@@ -1,43 +1,4 @@
 .homeContainer {
   position: relative;
   width: 100%;
-
-  /* Glowing background grid lines spotlight where mouse is */
-  &::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      linear-gradient(to right, rgba(255, 138, 0, 0.4) 1.5px, transparent 1.5px),
-      linear-gradient(to bottom, rgba(255, 138, 0, 0.4) 1.5px, transparent 1.5px);
-    background-size: 64px 64px;
-    background-position: top center;
-    mask-image: radial-gradient(135px circle at var(--grid-mouse-x, -999px) var(--grid-mouse-y, -999px),
-        rgba(0, 0, 0, 0.75) 0%,
-        rgba(0, 0, 0, 0.3) 50%,
-        transparent 80%);
-    -webkit-mask-image: radial-gradient(135px circle at var(--grid-mouse-x, -999px) var(--grid-mouse-y, -999px),
-        rgba(0, 0, 0, 0.75) 0%,
-        rgba(0, 0, 0, 0.3) 50%,
-        transparent 80%);
-    opacity: var(--grid-spotlight-opacity, 0);
-    transition: opacity 0.3s ease;
-    z-index: 1;
-  }
-
-  /* Soft ambient background glow inside grid boxes behind mouse pointer */
-  &::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(160px circle at var(--grid-mouse-x, -999px) var(--grid-mouse-y, -999px),
-        rgba(255, 138, 0, 0.08) 0%,
-        rgba(255, 115, 0, 0.02) 55%,
-        transparent 85%);
-    opacity: var(--grid-spotlight-opacity, 0);
-    transition: opacity 0.3s ease;
-    z-index: 1;
-  }
 }

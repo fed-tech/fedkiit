@@ -29,32 +29,6 @@ function Hero() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const main = mainRef.current;
-    if (!main) return undefined;
-
-    const handleMouseMove = (e) => {
-      const rect = main.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      main.style.setProperty("--grid-mouse-x", `${x}px`);
-      main.style.setProperty("--grid-mouse-y", `${y}px`);
-      main.style.setProperty("--grid-spotlight-opacity", "1");
-    };
-
-    const handleMouseLeave = () => {
-      main.style.setProperty("--grid-spotlight-opacity", "0");
-    };
-
-    main.addEventListener("mousemove", handleMouseMove);
-    main.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      main.removeEventListener("mousemove", handleMouseMove);
-      main.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []);
-
-  useEffect(() => {
     const title = titles[titleIndex];
     const typingSpeed = isDeleting ? 40 : 110;
 

@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "node scripts/with-env.mjs dev",
+    "tunnel": "node scripts/tunnel.mjs",
+    "expose": "node scripts/expose.mjs",
     "build": "node scripts/with-env.mjs build",
     "start": "node scripts/with-env.mjs start",
     "lint": "eslint",

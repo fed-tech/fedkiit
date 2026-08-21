@@ -1,37 +1,31 @@
-// The page shell inside `.authpage`.
-//
-// `.authpage` is a column flex container with `align-items: center`, so its
-// child is sized shrink-to-fit on the cross axis. This wrapper had no width of
-// its own, collapsed to its content, and `.container`'s `width: 100%` then
-// resolved against that — the card rendered ~257px wide on a laptop and never
-// reached its 480px max-width.
+// Clean, polished auth page.
+// No glow effects, gradients, hover scaling, or animated hover effects.
+
 .page {
   width: 100%;
+  min-height: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .container {
   position: relative;
   z-index: 10;
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  padding: 2.25rem;
   width: 100%;
   max-width: 480px;
   margin: auto;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  padding: 2.25rem;
+
   display: flex;
   flex-direction: column;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    border-color: rgba(255, 85, 0, 0.3);
-    box-shadow: 0 24px 60px rgba(255, 85, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  }
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+
+  // Keep the shadow subtle and static.
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 .form {
@@ -48,63 +42,57 @@
   justify-content: center;
 }
 
-.circle {
-  height: 22rem;
-  width: 22rem;
-  background-color: rgba(255, 85, 0, 0.14);
-  filter: blur(90px);
-  position: absolute;
-  top: 15%;
-  left: -8%;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-}
-
+// Removed:
+// - orange glow
+// - blur filters
+// - gradient effects
+// - animated transitions
+// - hover scaling
+// - hover border-color changes
+// - decorative glow circles
+.circle,
 .circle1 {
-  height: 22rem;
-  width: 22rem;
-  background-color: rgba(255, 85, 0, 0.14);
-  filter: blur(90px);
-  position: absolute;
-  bottom: 15%;
-  right: -8%;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .ArrowBackIcon {
   position: fixed;
   top: 1.5rem;
   left: 1.5rem;
-  color: #ffffff;
-  cursor: pointer;
-  z-index: 50;
+
+  width: 40px;
+  height: 40px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
 
-  &:hover {
-    background: rgba(255, 85, 0, 0.2);
-    color: #ff5500;
-  }
+  color: #ffffff;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+
+  cursor: pointer;
+  z-index: 50;
+
+  // No transition or hover animation.
 }
 
 .divider {
   height: 1px;
   flex: 1;
-  background-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 @media (max-width: 500px) {
+  .page {
+    align-items: flex-start;
+    padding-top: 5rem;
+  }
+
   .container {
+    width: calc(100% - 2rem);
+    max-width: none;
     padding: 1.5rem;
     border-radius: 16px;
   }

@@ -5,7 +5,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { api } from "../../services";
 import style from "./styles/Event.module.scss";
 import AuthContext from "../../context/AuthContext";
-import { EventCard } from "../../components";
+import { EventCard, EventCardSkeleton } from "../../components";
 import { ErrorArt, NoEventsArt } from "./components/Artwork";
 import Disclosure from "./components/Disclosure";
 import { RecoveryContext } from "../../context/RecoveryContext";
@@ -217,36 +217,32 @@ const Event = () => {
         
 
           {isLoading ? (
-            <section className={style.group} aria-busy="true">
-              <div className={style.groupHead}>
-                <h2 className={style.groupTitle}>Happening next</h2>
-              </div>
-              <div className={`${style.skeleton} ${style.skeletonFeatured}`}>
-                <div className={style.skeletonMedia} />
-                <div className={style.skeletonBody}>
-                  <span className={style.skeletonLine} style={{ width: "35%" }} />
-                  <span className={style.skeletonLine} style={{ width: "55%" }} />
-                  <span className={style.skeletonLine} style={{ width: "70%" }} />
-                  <span className={style.skeletonLine} style={{ width: "90%" }} />
-                  <span className={style.skeletonCta} />
+            <>
+              <section className={style.group} aria-busy="true">
+                <div className={style.groupHead}>
+                  <h2 className={style.groupTitle}>Happening next</h2>
+                  <span className={style.skeletonCountdown} aria-hidden="true" />
                 </div>
-              </div>
-              <div className={style.grid} style={{ marginTop: "1.5rem" }}>
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className={style.skeleton}>
-                    <div className={style.skeletonMedia} />
-                    <div className={style.skeletonBody}>
-                      <span className={style.skeletonLine} />
-                      <span
-                        className={style.skeletonLine}
-                        style={{ width: "60%" }}
-                      />
-                    </div>
+                <EventCardSkeleton variant="featured" />
+              </section>
+
+              <section className={style.group} aria-busy="true">
+                <div className={style.groupHead}>
+                  <div className={style.skeletonGroupToggle} aria-hidden="true">
+                    <span className={style.skeletonChevron} />
+                    <span className={style.skeletonGroupLabel} />
+                    <span className={style.skeletonGroupCount} />
                   </div>
-                ))}
-              </div>
+                </div>
+                <div className={style.grid}>
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <EventCardSkeleton key={i} />
+                  ))}
+                </div>
+              </section>
+
               <span className={style.srOnly}>Loading events</span>
-            </section>
+            </>
           ) : error ? (
             <div className={style.state} role="alert">
               <ErrorArt className={style.stateArt} />

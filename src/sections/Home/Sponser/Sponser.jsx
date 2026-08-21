@@ -48,61 +48,6 @@ const Sponser = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth <= 768) {
-      return undefined;
-    }
-
-    const track = trackRef.current;
-    if (!track) return undefined;
-
-    const container = track.parentElement;
-    if (!container) return undefined;
-
-    let animationFrameId;
-
-    const updateScale = () => {
-      const containerRect = container.getBoundingClientRect();
-      const containerCenter = containerRect.left + containerRect.width / 2;
-
-      const cards = track.children;
-      const maxDistance = window.innerWidth <= 640 ? 110 : 160;
-
-      for (let i = 0; i < cards.length; i++) {
-        const card = cards[i];
-        if (!card) continue;
-        const cardRect = card.getBoundingClientRect();
-        const cardCenter = cardRect.left + cardRect.width / 2;
-
-        const distance = Math.abs(cardCenter - containerCenter);
-
-        let scale = 1;
-        let boxShadow = "";
-        let zIndex = "";
-
-        if (distance < maxDistance) {
-          const factor = (maxDistance - distance) / maxDistance;
-          scale = 1 + factor * 0.25;
-          const glowOpacity = factor * 0.7;
-          boxShadow = `0 0 ${12 + factor * 22}px rgba(255, 138, 0, ${glowOpacity}), 0 0 ${6 + factor * 10}px rgba(255, 138, 0, ${factor * 0.4})`;
-          zIndex = "10";
-        }
-
-        card.style.transform = `scale(${scale})`;
-        card.style.boxShadow = boxShadow;
-        card.style.zIndex = zIndex;
-      }
-
-      animationFrameId = requestAnimationFrame(updateScale);
-    };
-
-    updateScale();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
   const logos = [...SponserImg, ...SponserImg];
 
   return (

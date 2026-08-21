@@ -84,10 +84,6 @@
   flex-shrink: 0;
   transition: all 0.2s ease;
 
-  &:hover {
-    border-color: #ff8a00 !important;
-  }
-
   &:checked {
     background-color: #ff5500 !important;
     border-color: #ff5500 !important;
@@ -106,7 +102,7 @@
   }
 
   &:focus-visible {
-    box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.4);
+    box-shadow: none;
   }
 }
 

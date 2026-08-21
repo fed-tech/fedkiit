@@ -5,6 +5,10 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/db";
 import { ApiError } from "@/lib/api/errors";
+import {
+  batchRegistrationErrorMessage,
+  isBatchRegistrationBlocked,
+} from "@/lib/batch-restriction";
 import type { SafeUser } from "@/lib/auth/access";
 import { sendMail } from "@/lib/email/mailer";
 import { registrationEmail } from "@/lib/email/templates";
@@ -87,6 +91,10 @@ export async function registerForEvent(input: {
 
   if (info.isPublic === false && user.access !== "ADMIN") {
     throw new ApiError(403, "This form is not open for registration.");
+  }
+
+  if (isBatchRegistrationBlocked(user.email)) {
+    throw new ApiError(400, batchRegistrationErrorMessage());
   }
 
   const alreadyRegistered =

@@ -5,16 +5,15 @@ import { useState, useEffect, useContext } from "react";
 import styles from "./style/Signup.module.scss";
 
 import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import AuthContext, { SESSION_TTL_MS } from "../../context/AuthContext";
 import google from "../../assets/images/google.png";
-import { Alert, MicroLoading } from "../../microInteraction";
+import { MicroLoading } from "../../microInteraction";
 import { api } from "../../services";
 import { useRouter } from "next/navigation";
 import postAuthRedirect from "../../utils/postAuthRedirect";
+import { isGoogleOAuthEnabled } from "../../utils/googleOAuth";
 
-export default function GoogleSignup({ setAlert }) {
-  // const [alert, setAlert] = useState(null);
+function GoogleSignupButton({ setAlert }) {
   const [codeResponse, setCodeResponse] = useState(null);
   const [shouldNavigate, setShouldNavigate] = useState(false);
   const [navigatePath, setNavigatePath] = useState("/");
@@ -23,7 +22,7 @@ export default function GoogleSignup({ setAlert }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const signUp = useGoogleLogin({
-    onSuccess: (codeResponse) => setCodeResponse(codeResponse),
+    onSuccess: (response) => setCodeResponse(response),
     onError: (error) => console.error("SignUp failed:", error),
   });
 
@@ -33,45 +32,37 @@ export default function GoogleSignup({ setAlert }) {
     }
   }, [codeResponse]);
 
-
-
-  // `replace`, not `push`: App.jsx redirected with <Navigate replace />.
   useEffect(() => {
     if (shouldNavigate) {
       router.replace(navigatePath);
-      setShouldNavigate(false); // Reset state after navigation
+      setShouldNavigate(false);
     }
   }, [shouldNavigate, navigatePath, router]);
 
   const handleSignUpSuccess = async () => {
     setIsLoading(true);
     try {
-   
-
-      // console.log("Google User Data:", googleUserData);
-
       try {
         const response = await api.post("/api/auth/googleAuth", {
           access_token: codeResponse.access_token,
         });
 
         if (response.status === 200 || response.status === 201) {
-          // User exists in the backend
           const user = response.data.user;
 
           setAlert({
             type: "success",
-            message: response.status === 200 ?"User Already Registered! Logged In successfully":"User Registered! Logged In successfully",
+            message:
+              response.status === 200
+                ? "User Already Registered! Logged In successfully"
+                : "User Registered! Logged In successfully",
             position: "bottom-right",
             duration: 3000,
           });
-          // `prevPage` is deliberately *not* cleared first. The original wiped
-          // it here, so a Google sign-up begun from a team invite link lost the
-          // invite and landed on the profile page instead of joining.
           setNavigatePath(postAuthRedirect("/"));
 
           setTimeout(() => {
-            localStorage.setItem("token",response.data.token);
+            localStorage.setItem("token", response.data.token);
             authCtx.login(
               user.name,
               user.email,
@@ -89,20 +80,14 @@ export default function GoogleSignup({ setAlert }) {
               user.regForm,
               user.blurhash,
               response.data.token,
-              SESSION_TTL_MS
+              SESSION_TTL_MS,
             );
-            // App.jsx re-rendered /SignUp as <LoginRedirect /> once isLoggedIn
-            // flipped; nothing watches that flag under the App Router, so the
-            // navigation this component was already wired for is triggered here.
             setShouldNavigate(true);
           }, 800);
         } else {
-          // Handle unexpected response status
           console.log("Unexpected backend response status:", response.status);
-          // handleFallbackOrCompleteProfile(googleUserData, googleResponse);
         }
       } catch (error) {
-        // API call error, fallback to local data
         console.error("Backend API call failed:", error);
       }
     } catch (error) {
@@ -118,41 +103,47 @@ export default function GoogleSignup({ setAlert }) {
     }
   };
 
-
   return (
-    <>
-      <button
-        style={{
-          backgroundColor: "transparent",
-          color: "#fff",
-          height: "40px",
-          marginTop: "20px",
-          fontSize: ".77rem",
-          cursor: "pointer",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        className={styles.google_btn}
-        onClick={signUp}
-      >
-        {isLoading ? (
-          <MicroLoading />
-        ) : (
-          <>
-            <img
-              src={google.src}
-              alt="google"
-              style={{
-                width: "18px",
-                height: "18px",
-                marginRight: "6px",
-              }}
-            />
-            <span>SignUp with Google</span>
-          </>
-        )}
-      </button>
-    </>
+    <button
+      type="button"
+      style={{
+        backgroundColor: "transparent",
+        color: "#fff",
+        height: "40px",
+        marginTop: "20px",
+        fontSize: ".77rem",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+      className={styles.google_btn}
+      onClick={() => signUp()}
+    >
+      {isLoading ? (
+        <MicroLoading />
+      ) : (
+        <>
+          <img
+            src={google.src}
+            alt="google"
+            style={{
+              width: "18px",
+              height: "18px",
+              marginRight: "6px",
+            }}
+          />
+          <span>SignUp with Google</span>
+        </>
+      )}
+    </button>
   );
+}
+
+export default function GoogleSignup({ setAlert }) {
+  if (!isGoogleOAuthEnabled()) {
+    return null;
+  }
+
+  return <GoogleSignupButton setAlert={setAlert} />;
 }

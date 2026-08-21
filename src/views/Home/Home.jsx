@@ -13,29 +13,6 @@ const Home = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  useEffect(() => {
-    const el = homeRef.current;
-    if (!el) return undefined;
-
-    const handleMouseMove = (e) => {
-      el.style.setProperty("--grid-mouse-x", `${e.clientX}px`);
-      el.style.setProperty("--grid-mouse-y", `${e.clientY}px`);
-      el.style.setProperty("--grid-spotlight-opacity", "1");
-    };
-
-    const handleMouseLeave = () => {
-      el.style.setProperty("--grid-spotlight-opacity", "0");
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []);
-
   return (
     <div ref={homeRef} className={styles.homeContainer}>
       <LiveEventPopup />

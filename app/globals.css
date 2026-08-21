@@ -19,7 +19,6 @@
   --fed-border-hover: rgba(255, 255, 255, 0.16);
   --fed-orange: #f97316;
   --fed-orange-dark: #ea580c;
-  --fed-orange-glow: rgba(249, 115, 22, 0.25);
   --fed-text: #ffffff;
   --fed-muted: #888888;
   --fed-subtle: #555555;
@@ -83,35 +82,13 @@ main>div {
   background-color: transparent !important;
 }
 
-/* ─── Background Patterns & Glows ───────────────────────────────── */
+/* ─── Background Patterns ───────────────────────────────────────── */
 .bg-grid-pattern {
   background-color: #080808;
   background-image:
     linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
   background-size: 64px 64px;
-}
-
-.bg-grid-glow {
-  position: relative;
-}
-
-.bg-top-orange-glow {
-  position: relative;
-}
-
-.bg-top-orange-glow::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 1200px;
-  height: 600px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, 0.18) 0%, rgba(249, 115, 22, 0.05) 45%, transparent 75%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* ─── Responsive Section & Container Layouts ────────────────────── */
@@ -156,33 +133,6 @@ main>div {
     padding-top: 10rem;
     padding-bottom: 6rem;
   }
-}
-
-/* ─── Alternating Section Glow Effects ───────────────────────────── */
-.section-glow-left::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -10%;
-  transform: translateY(-50%);
-  width: 55%;
-  height: 85%;
-  background: radial-gradient(ellipse at left center, rgba(249, 115, 22, 0.14) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.section-glow-right::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -10%;
-  transform: translateY(-50%);
-  width: 55%;
-  height: 85%;
-  background: radial-gradient(ellipse at right center, rgba(249, 115, 22, 0.14) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* ─── Navbar Styles ──────────────────────────────────────────────── */
@@ -392,7 +342,6 @@ main>div {
 .fed-btn-orange:hover {
   background: #ff6611;
   transform: none !important;
-  box-shadow: 0 0 16px rgba(255, 85, 0, 0.55) !important;
 }
 
 .fed-btn-orange--full {
@@ -481,7 +430,6 @@ main>div {
   border: 1px solid rgba(249, 115, 22, 0.7) !important;
   color: #ffffff !important;
   font-weight: 700 !important;
-  box-shadow: inset 0 0 12px rgba(249, 115, 22, 0.3) !important;
 }
 
 @media (min-width: 768px) {
@@ -539,17 +487,15 @@ main>div {
   padding: 0.65rem 1.5rem;
   border-radius: 9999px;
   text-decoration: none;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
   white-space: nowrap;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 20px var(--fed-orange-glow);
 }
 
 .fed-btn-primary:hover {
   background: var(--fed-orange-dark);
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(249, 115, 22, 0.45);
 }
 
 .fed-btn-secondary {
@@ -565,14 +511,13 @@ main>div {
   padding: 0.65rem 1.5rem;
   border-radius: 9999px;
   text-decoration: none;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+  transition: background 0.2s ease, transform 0.15s ease;
   white-space: nowrap;
   cursor: pointer;
 }
 
 .fed-btn-secondary:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
   transform: translateY(-1px);
 }
 
@@ -598,22 +543,6 @@ main>div {
   background: var(--fed-orange);
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 8px var(--fed-orange);
-  animation: pulse-dot 2s ease-in-out infinite;
-}
-
-@keyframes pulse-dot {
-
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.4;
-    transform: scale(0.75);
-  }
 }
 
 /* ─── Typography & Headings ──────────────────────────────────────── */
@@ -645,11 +574,10 @@ main>div {
   background: var(--fed-surface);
   border: 1px solid var(--fed-border);
   border-radius: 24px;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .fed-card:hover {
-  border-color: var(--fed-border-hover);
   transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
@@ -661,11 +589,10 @@ main>div {
   border-radius: 24px;
   padding: 2.5rem 1.75rem;
   text-align: center;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .fed-stat-card:hover {
-  border-color: rgba(255, 255, 255, 0.16);
   transform: translateY(-2px);
 }
 
@@ -698,10 +625,6 @@ main>div {
   transition: border-color 0.2s ease;
 }
 
-.fed-img-placeholder:hover {
-  border-color: rgba(249, 115, 22, 0.6);
-}
-
 .fed-img-placeholder-icon {
   width: 50px;
   height: 50px;
@@ -719,31 +642,16 @@ main>div {
   border: 1px solid var(--fed-border);
   border-radius: 24px;
   overflow: hidden;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .fed-event-card:hover {
-  border-color: rgba(249, 115, 22, 0.4);
   transform: translateY(-4px);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
 }
 
 .fed-event-card--live {
   border-color: rgba(34, 197, 94, 0.4);
-  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2), 0 0 45px rgba(34, 197, 94, 0.14);
-  animation: live-pulse 3s ease-in-out infinite;
-}
-
-@keyframes live-pulse {
-
-  0%,
-  100% {
-    box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2), 0 0 40px rgba(34, 197, 94, 0.12);
-  }
-
-  50% {
-    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.45), 0 0 65px rgba(34, 197, 94, 0.22);
-  }
 }
 
 .fed-event-tag {
@@ -798,7 +706,7 @@ main>div {
 }
 
 .status-dot--live {
-  animation: pulse-dot 1.5s ease-in-out infinite;
+  background: currentColor;
 }
 
 /* ─── Sponsor Cards & Carousel ───────────────────────────────────── */
@@ -847,12 +755,11 @@ main>div {
   gap: 1rem;
   min-width: 200px;
   width: 200px;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   flex-shrink: 0;
 }
 
 .fed-sponsor-card:hover {
-  border-color: rgba(249, 115, 22, 0.4);
   transform: translateY(-3px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
 }
@@ -867,12 +774,7 @@ main>div {
   align-items: center;
   justify-content: center;
   color: rgba(249, 115, 22, 0.5);
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.fed-sponsor-card:hover .fed-sponsor-img-placeholder {
-  border-color: rgba(249, 115, 22, 0.6);
-  background: rgba(249, 115, 22, 0.06);
+  transition: background 0.2s ease;
 }
 
 /* ─── Testimonial Carousel ───────────────────────────────────────── */
@@ -912,8 +814,6 @@ main>div {
 
 .testimonial-dot--active {
   background: var(--fed-orange);
-  transform: scale(1.35);
-  box-shadow: 0 0 10px var(--fed-orange-glow);
 }
 
 .testimonial-nav-btn {
@@ -927,13 +827,12 @@ main>div {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: background 0.2s ease;
   flex-shrink: 0;
 }
 
 .testimonial-nav-btn:hover {
   background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .fed-testimonial-card {
@@ -941,19 +840,18 @@ main>div {
   border: 1px solid var(--fed-border);
   border-radius: 24px;
   padding: 2.75rem 2.25rem;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
   width: 100%;
 }
 
 .fed-testimonial-card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-3px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
 }
 
 /* ─── CTA Banner ─────────────────────────────────────────────────── */
 .fed-cta-banner {
-  background: radial-gradient(ellipse at 50% 100%, rgba(249, 115, 22, 0.2) 0%, rgba(17, 17, 17, 0.96) 75%);
+  background: rgba(17, 17, 17, 0.96);
   border: 1px solid var(--fed-border);
   border-radius: 28px;
   padding: 5rem 2.5rem;
@@ -1060,17 +958,15 @@ main>div {
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 30px;
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: box-shadow 0.25s ease;
 }
 
 .event-featured-card:hover {
-  border-color: rgba(249, 115, 22, 0.45);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
 }
 
 .event-featured-card--live {
   border-color: rgba(34, 197, 94, 0.35);
-  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.12), 0 0 60px rgba(34, 197, 94, 0.1);
 }
 
 .event-grid-card {
@@ -1080,18 +976,16 @@ main>div {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .event-grid-card:hover {
-  border-color: rgba(249, 115, 22, 0.35);
   transform: translateY(-4px);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
 }
 
 .event-grid-card--live {
   border-color: rgba(34, 197, 94, 0.35);
-  animation: live-pulse 3s ease-in-out infinite;
 }
 
 .event-img-area {
@@ -1205,13 +1099,11 @@ main>div {
   background: rgba(249, 115, 22, 0.42);
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 0 8px rgba(249, 115, 22, 0.25);
-  transition: all 0.25s ease;
+  transition: background 0.25s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(249, 115, 22, 0.75);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.45), 0 0 14px rgba(249, 115, 22, 0.45);
 }
 
 /* ─── Animations ─────────────────────────────────────────────────── */
@@ -1265,12 +1157,11 @@ main>div {
   align-items: center;
   text-decoration: none;
   border-radius: 9999px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
 .fed-avatar-link:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 0 2px rgba(255, 85, 0, 0.55);
 }
 
 .fed-avatar {

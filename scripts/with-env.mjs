@@ -83,7 +83,13 @@ if (!ensurePrismaClient(env)) process.exit(1);
 
 const nextBin = resolve(root, "node_modules", "next", "dist", "bin", "next");
 
-const child = spawn(process.execPath, [nextBin, ...args], {
+// Listen on all interfaces in dev so phones on the same Wi‑Fi can hit the LAN IP.
+const nextArgs = [...args];
+if (args[0] === "dev" && !nextArgs.includes("-H")) {
+  nextArgs.push("-H", "0.0.0.0");
+}
+
+const child = spawn(process.execPath, [nextBin, ...nextArgs], {
   cwd: root,
   env,
   stdio: "inherit",

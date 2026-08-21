@@ -9,6 +9,10 @@ import { sendMail } from "@/lib/email/mailer";
 import { registrationEmail } from "@/lib/email/templates";
 import { uploadImage } from "@/lib/services/upload";
 import type { EventInfo } from "@/lib/types/event";
+import {
+  batchRegistrationErrorMessage,
+  isBatchRegistrationBlocked,
+} from "@/lib/batch-restriction";
 
 /**
  * POST /api/form/register
@@ -119,6 +123,10 @@ export async function POST(request: Request) {
         401,
         "Registering to a private form is not allowed. If you feel this is an error, kindly contact us on fedkiit@gmail.com",
       );
+    }
+
+    if (isBatchRegistrationBlocked(user.email)) {
+      return expressError(400, batchRegistrationErrorMessage());
     }
 
     if (

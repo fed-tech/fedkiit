@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useContext } from "react";
-import { Button, Input, Text, Section } from "../../../../../components";
+import { Button, Input, Text, Section, MarkdownEditor } from "../../../../../components";
 import { IoSettingsOutline, IoSettingsSharp } from "react-icons/io5";
 import AuthContext from "../../../../../context/AuthContext";
 import { PreviewForm } from "../../../../../features";
@@ -1481,11 +1481,10 @@ function NewForm() {
               width: "45%",
             }}
           >
-            <Input
+            <MarkdownEditor
               placeholder="Enter Event Description"
               label="Event Description"
-              type="textArea"
-              className={` ${styles.formInputTxtArea}`}
+              className={styles.formInputTxtArea}
               value={data.eventdescription}
               onChange={(e) =>
                 setdata({ ...data, eventdescription: e.target.value })

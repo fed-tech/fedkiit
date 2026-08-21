@@ -138,40 +138,19 @@
   box-shadow: var(--depth);
   -webkit-tap-highlight-color: transparent;
   transition:
-    border-color 0.25s var(--ease),
     background 0.25s var(--ease),
     color 0.25s var(--ease),
     transform 0.25s var(--ease),
     box-shadow 0.25s var(--ease);
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -40%;
-    background: radial-gradient(
-      circle at 30% 30%,
-      rgba(255, 138, 0, 0.35),
-      transparent 55%
-    );
-    opacity: 0;
-    transition: opacity 0.25s var(--ease);
-  }
-
   &:hover {
-    border-color: rgba(255, 138, 0, 0.55);
     color: #fff;
-    transform: translateY(-2px) scale(1.04);
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.35),
-      0 0 0 1px rgba(255, 138, 0, 0.15);
-
-    &::before {
-      opacity: 1;
-    }
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   }
 
   &:active {
-    transform: translateY(0) scale(0.98);
+    transform: translateY(0);
   }
 }
 

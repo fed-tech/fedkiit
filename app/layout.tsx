@@ -3,6 +3,7 @@ import Script from "next/script";
 
 import Providers from "@/src/context/Providers";
 import Chatbot from "@/src/components/Chatbot/Chatbot";
+import ToastProvider from "@/src/components/ToastProvider/ToastProvider";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { SITE } from "@/lib/site";
 import { SITE_URL } from "@/lib/seo/metadata";
@@ -101,6 +102,7 @@ export default function RootLayout({
             AuthContext to attach the signed-in user to a conversation.
           */}
           <Chatbot />
+          <ToastProvider />
           {children}
         </Providers>
 

@@ -71,20 +71,14 @@
   flex-direction: column;
   height: 100%;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, box-shadow 0.35s ease;
 
   &:hover {
     transform: translateY(-4px);
-    border-color: rgba(255, 85, 0, 0.35);
     background: rgba(26, 26, 26, 0.78);
-    box-shadow: 
-      0 0 18px rgba(255, 85, 0, 0.16),
+    box-shadow:
       0 16px 40px rgba(0, 0, 0, 0.6),
       inset 0 1px 0 rgba(255, 255, 255, 0.15);
-
-    .cardImage {
-      transform: scale(1.04);
-    }
 
     .eventTitle {
       color: #ff8a00;
@@ -191,7 +185,6 @@
 
   &:hover {
     background: rgba(249, 115, 22, 0.15);
-    border-color: rgba(249, 115, 22, 0.4);
     transform: translateY(-2px);
   }
 }

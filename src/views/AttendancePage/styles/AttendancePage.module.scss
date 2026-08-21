@@ -98,11 +98,25 @@
     font-size: 1.2rem;
   }
 
-  .scannerArea {
-    border: 2px solid var(--primary);
-    border-radius: 8px;
-    overflow: hidden;
-    margin: 1rem 0;
+.scannerStats {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.errorState {
+  padding: 2rem;
+  text-align: center;
+  color: #ff6b6b;
+}
+
+.scannerArea {
+  border: 2px solid var(--primary);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+  position: relative;
     
     #qr-reader {
       width: 100%;
