@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
+import { devAllowedOrigins } from "./lib/dev-origins";
+
 const nextConfig: NextConfig = {
+  // Dev-only: allow LAN IP, ngrok, and Cloudflare tunnel hosts to load /_next/*
+  // bundles and HMR. Without this, opening http://10.x.x.x:5000 or a tunnel URL
+  // serves HTML but blocks client JS — login and all client API calls break.
+  allowedDevOrigins: devAllowedOrigins(),
   // Inject the shared SCSS variables into every stylesheet. The original
   // modules each did `@import ".../Global.scss"`, and two used Vite's absolute
   // "/src/..." form which Next cannot resolve. Injecting once is equivalent and

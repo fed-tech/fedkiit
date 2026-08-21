@@ -19,6 +19,10 @@ import {
 import { RecoveryContext } from "../../../../context/RecoveryContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  batchRegistrationErrorMessage,
+  isBatchRegistrationBlocked,
+} from "../../../../utils/batchRestriction";
 
 const operators = [
   { label: "match", value: "===" },
@@ -406,6 +410,16 @@ const PreviewForm = ({
 
   const handleSubmit = async () => {
     if (!currentSection || !areRequiredFieldsFilled()) {
+      return;
+    }
+
+    if (isBatchRegistrationBlocked(authCtx.user?.email)) {
+      Alert({
+        type: "info",
+        message: batchRegistrationErrorMessage(),
+        position: "bottom-right",
+        duration: 4000,
+      });
       return;
     }
 

@@ -5,6 +5,11 @@ import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "@/lib/db";
 import { ApiError } from "@/lib/api/errors";
 import { getEnv } from "@/lib/env";
+import {
+  batchAttendanceQrBlockedMessage,
+  isBatchAttendanceQrBlocked,
+  registrationDateFromSubmission,
+} from "@/lib/batch-restriction";
 import type { SafeUser } from "@/lib/auth/access";
 import type { EventInfo } from "@/lib/types/event";
 
@@ -191,6 +196,14 @@ export async function getAttendanceCode(
   if (!form) throw new ApiError(404, "Form not found");
 
   const registration = await findUserRegistration(formId, user, teamCode);
+
+  const registeredAt = registrationDateFromSubmission(registration);
+  if (isBatchAttendanceQrBlocked(user.email, registeredAt)) {
+    throw new ApiError(403, batchAttendanceQrBlockedMessage(), [
+      { code: "BATCH_QR_BLOCKED" },
+    ]);
+  }
+
   const info = submissionInfoForUser(registration, user);
 
   const attendanceData = {

@@ -287,8 +287,8 @@ const SignUp = () => {
     setShowModal(false);
   };
 
-  const handleCheckBox = () => {
-    setTandC((prevState) => !prevState);
+  const handleCheckBox = (e) => {
+    setTandC(e.target.checked);
   };
 
   // console.log(alert)
@@ -477,7 +477,7 @@ const SignUp = () => {
                   type="checkbox"
                   style={{ height: "17px", width: "17px", cursor: "pointer" }}
                   checked={isTandChecked}
-                  onClick={handleCheckBox}
+                  onChange={handleCheckBox}
                   id="custom-checkbox"
                 />
 

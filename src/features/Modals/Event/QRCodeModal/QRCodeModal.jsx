@@ -42,7 +42,10 @@ const QRCodeModal = ({ onClose, eventId }) => {
       const message = err?.response?.data?.message;
       const code = err?.response?.data?.errors?.[0]?.code;
 
-      if (code === "ALREADY_MARKED" || message?.toLowerCase().includes("already marked")) {
+      if (code === "BATCH_QR_BLOCKED") {
+        setError(message || "Attendance QR is not available for your registration.");
+        setQrCodeData(null);
+      } else if (code === "ALREADY_MARKED" || message?.toLowerCase().includes("already marked")) {
         setError("You are already checked in for this event.");
         setQrCodeData(null);
       } else if (err?.response?.status === 401) {

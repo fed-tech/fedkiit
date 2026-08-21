@@ -16,6 +16,12 @@ import { Alert, MicroLoading } from "../../microInteraction";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { isPrerequisiteMet } from "../../utils/prerequisite";
+import {
+  batchRegistrationErrorMessage,
+  isBatchRegistrationBlocked,
+  isCurrentBatchEmail,
+  stripMarkdownForPreview,
+} from "../../utils/batchRestriction";
 import { cdn } from "../../utils/cloudinary";
 
 export function EventCardSkeleton({ variant = "default" }) {
@@ -216,6 +222,11 @@ const EventCard = (props) => {
       return;
     }
 
+    if (isBatchRegistrationBlocked(authCtx.user.email)) {
+      setBtnTxt(info.isRegistrationClosed ? "Closed" : "Not Eligible");
+      return;
+    }
+
     setBtnTxt(openState());
   }, [
     authCtx.isLoggedIn,
@@ -239,6 +250,16 @@ const EventCard = (props) => {
       authCtx.user.regForm &&
       authCtx.user.regForm.includes(data.id)
     ) {
+      if (isCurrentBatchEmail(authCtx.user.email)) {
+        setAlert({
+          type: "info",
+          message:
+            "Attendance QR codes are not available for your batch. Please contact fedkiit@gmail.com if you need help.",
+          position: "bottom-right",
+          duration: 4000,
+        });
+        return;
+      }
       setQRModalOpen(!isQRModalOpen);
     } else if (!authCtx.isLoggedIn) {
       setAlert({
@@ -281,6 +302,15 @@ const EventCard = (props) => {
         message: `You need to register for ${eventName || "the required event"} first`,
         position: "bottom-right",
         duration: 3000,
+      });
+      return false;
+    }
+    if (btnTxt === "Not Eligible") {
+      setAlert({
+        type: "info",
+        message: batchRegistrationErrorMessage(),
+        position: "bottom-right",
+        duration: 4000,
       });
       return false;
     }
@@ -381,6 +411,7 @@ const EventCard = (props) => {
   const isCtaInert =
     btnTxt === "Closed" ||
     btnTxt === "Already Member" ||
+    btnTxt === "Not Eligible" ||
     (btnTxt === "Already Registered" && info.participationType !== "Team");
 
   const ctaContent = () => {
@@ -400,6 +431,14 @@ const EventCard = (props) => {
         <>
           <IoIosLock aria-hidden="true" />
           Locked
+        </>
+      );
+    }
+    if (btnTxt === "Not Eligible") {
+      return (
+        <>
+          <IoIosLock aria-hidden="true" />
+          Not eligible
         </>
       );
     }
@@ -579,7 +618,9 @@ const EventCard = (props) => {
         </h3>
 
         {info.eventdescription && (
-          <p className={style.description}>{info.eventdescription}</p>
+          <p className={style.description}>
+            {stripMarkdownForPreview(info.eventdescription)}
+          </p>
         )}
       </div>
 
@@ -615,7 +656,9 @@ const EventCard = (props) => {
               <Share2 size={16} aria-hidden="true" />
             </button>
           )}
-          {!isPast && isRegistered && (
+          {!isPast &&
+            isRegistered &&
+            !isCurrentBatchEmail(authCtx.user?.email) && (
             <button
               type="button"
               className={style.tool}

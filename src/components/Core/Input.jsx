@@ -143,7 +143,7 @@ const Input = (props) => {
     containerStyle,
     style,
     placeholder,
-    value = "",
+    value,
     onChange,
     label,
     options,
@@ -162,14 +162,19 @@ const Input = (props) => {
   const [showPassword, setshowPassword] = useState(false);
   const [previewFile, setpreviewFile] = useState(null);
 
+  // When callers pass only `onChange` (no `value`), keep the field uncontrolled.
+  // Defaulting `value` to "" used to force every input controlled at "" — typing
+  // never appeared because React kept resetting the DOM value.
+  const isControlled = Object.prototype.hasOwnProperty.call(props, "value");
+  const controlledValue = isControlled ? (value ?? "") : undefined;
+  const valueProps = isControlled ? { value: controlledValue } : {};
+
   const filterPassedTime = (time) => {
     const currentDate = new Date();
     const selectedDate = new Date(time);
 
     return currentDate.getTime() < selectedDate.getTime();
   };
-
-  const safeValue = value ?? "";
 
   const getInputTypes = () => {
     switch (type) {
@@ -181,7 +186,7 @@ const Input = (props) => {
             type={type}
             style={style || {}}
             placeholder={placeholder}
-            value={safeValue}
+            {...valueProps}
             onChange={onChange}
             {...rest}
           />
@@ -195,7 +200,7 @@ const Input = (props) => {
             type={type}
             style={style || {}}
             placeholder={placeholder}
-            value={safeValue}
+            {...valueProps}
             onChange={onChange}
             {...rest}
           />
@@ -209,7 +214,7 @@ const Input = (props) => {
             type={type}
             style={style || {}}
             placeholder={placeholder}
-            value={safeValue}
+            {...valueProps}
             onChange={onChange}
             {...rest}
           />
@@ -221,7 +226,11 @@ const Input = (props) => {
             <Select
               name={name}
               placeholder={placeholder}
-              value={options.find((option) => option.value === value) || ""}
+              value={
+                isControlled
+                  ? options.find((option) => option.value === value) || null
+                  : undefined
+              }
               options={options}
               onChange={(selectedOption) => onChange(selectedOption.value)}
               styles={customStyles}
@@ -340,7 +349,7 @@ const Input = (props) => {
                 type={showPassword ? "text" : "password"}
                 style={style || {}}
                 placeholder={placeholder}
-                value={safeValue}
+                {...valueProps}
                 onChange={onChange}
                 {...rest}
               />
@@ -495,7 +504,7 @@ const Input = (props) => {
             type={type}
             style={style || {}}
             placeholder={placeholder}
-            value={safeValue}
+            {...valueProps}
             onChange={onChange}
             {...rest}
           />
