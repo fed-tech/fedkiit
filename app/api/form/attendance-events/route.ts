@@ -3,7 +3,8 @@ import {
   listAttendanceEvents,
 } from "@/lib/services/attendance";
 import { expressError, handle, json } from "@/lib/api/express";
-import { getCurrentUser, isAdmin } from "@/lib/auth/access";
+import { getCurrentUser } from "@/lib/auth/access";
+import { canMarkAttendance } from "@/lib/auth/permissions";
 
 /**
  * GET /api/form/attendance-events
@@ -15,7 +16,7 @@ export async function GET() {
   return handle(async () => {
     const user = await getCurrentUser();
     if (!user) return expressError(401, "Token is required");
-    if (!isAdmin(user)) return expressError(403, "Unauthorized");
+    if (!canMarkAttendance(user)) return expressError(403, "Unauthorized");
 
     const events = await listAttendanceEvents();
     return json({

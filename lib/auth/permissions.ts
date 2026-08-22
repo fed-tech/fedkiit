@@ -1,6 +1,8 @@
 import "server-only";
 
 import type { SafeUser } from "@/lib/auth/access";
+import { isAdmin } from "@/lib/auth/access";
+import { isAttendanceScanner } from "@/lib/auth/attendance";
 import { FORM_ANALYTICS_ROLES } from "@/lib/auth/roles";
 import { envList, getEnv } from "@/lib/env";
 
@@ -56,4 +58,18 @@ export function canViewFormAnalytics(
     entry.toLowerCase(),
   );
   return allowed.includes(user.email.toLowerCase());
+}
+
+/**
+ * Who may open the attendance scanner and call its APIs.
+ *
+ * ADMIN plus the dedicated door-duty account. Both the page and every
+ * attendance endpoint use this so the sidebar cannot promise access the
+ * server will refuse.
+ */
+export function canMarkAttendance(
+  user: Pick<SafeUser, "access" | "email"> | null | undefined,
+): boolean {
+  if (!user) return false;
+  return isAdmin(user) || isAttendanceScanner(user);
 }

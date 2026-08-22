@@ -1,12 +1,13 @@
 import { markAttendance } from "@/lib/services/attendance";
 import { body, expressError, handle, json } from "@/lib/api/express";
-import { getCurrentUser, isAdmin } from "@/lib/auth/access";
+import { getCurrentUser } from "@/lib/auth/access";
+import { canMarkAttendance } from "@/lib/auth/permissions";
 
 /**
  * POST /api/form/markAttendance
  * Port of controllers/registration/markAttendance.js.
  *
- * ADMIN only. This deliberately diverges from the Express route, which has its
+ * ADMIN and the dedicated door-duty account. This deliberately diverges from the Express route, which has its
  * `checkAccess` commented out entirely and so accepts unauthenticated calls.
  *
  * The QR token alone is not an access control: a participant can mint their own
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
   return handle(async () => {
     const user = await getCurrentUser();
     if (!user) return expressError(401, "Token is required");
-    if (!isAdmin(user)) return expressError(403, "Unauthorized");
+    if (!canMarkAttendance(user)) return expressError(403, "Unauthorized");
 
     const b = await body<{ formId?: string; token?: string }>(request);
     const result = await markAttendance({ formId: b.formId, token: b.token });
