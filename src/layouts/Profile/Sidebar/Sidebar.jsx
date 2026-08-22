@@ -9,6 +9,7 @@ import { SiReacthookform } from "react-icons/si";
 import { FaRegNewspaper, FaCertificate, FaChevronDown } from "react-icons/fa";
 import { LuClipboardList } from "react-icons/lu";
 import AuthContext from "../../../context/AuthContext";
+import { isAttendanceScanner } from "@/lib/auth/attendance";
 import styles from "./styles/Sidebar.module.scss";
 
 import defaultImg from "../../../assets/images/defaultImg.jpg";
@@ -33,7 +34,7 @@ const Sidebar = ({ activepage, handleChange }) => {
     const access = authCtx.user.access;
     const email = authCtx.user.email; // Assuming email is available in authCtx.user
     
-    if (email === "attendance@fedkiit.com") {
+    if (isAttendanceScanner({ email })) {
       setDesignation("Attendance Only");
     } else if (access === "ADMIN") {
       setDesignation("Admin");
@@ -92,7 +93,7 @@ const Sidebar = ({ activepage, handleChange }) => {
   };
 
   // Check if user is attendance-only
-  const isAttendanceOnly = authCtx.user.email === "attendance@fedkiit.com";
+  const isAttendanceOnly = isAttendanceScanner(authCtx.user);
 
   const renderBlogMenu = () => {
     return (
