@@ -53,6 +53,38 @@
   width: 70%;
 }
 
+/* ── ProfileCard wrapper ───────────────────────────────────── */
+.profileCardWrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: 10rem;
+  margin-bottom: 2.5rem;
+  /* Allow the 3-D tilt to overflow without clipping */
+  overflow: visible;
+  perspective: 900px;
+}
+
+@media screen and (max-width: 989px) {
+  .profileCardWrapper {
+    margin-left: 5rem;
+  }
+}
+
+@media screen and (max-width: 867px) {
+  .profileCardWrapper {
+    margin-left: 2rem;
+  }
+}
+
+@media screen and (max-width: 769px) {
+  .profileCardWrapper {
+    justify-content: center;
+    margin-left: 0;
+  }
+}
+
+
 .vals {
   font-family: "Open Sans", sans-serif;
   font-size: 20px;

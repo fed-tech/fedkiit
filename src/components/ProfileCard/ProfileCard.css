@@ -1,0 +1,278 @@
+/* ============================================================
+   ProfileCard — React Bits inspired implementation
+   Adapted for FED KIIT: standard JPEG/PNG avatars, no
+   mix-blend-mode luminosity, full-colour photos.
+   ============================================================ */
+
+:root {
+  --card-radius: 20px;
+  --card-w: 300px;
+  --card-h: 400px;
+  --card-bg: rgba(24, 24, 28, 0.85);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --primary-glow: rgba(208, 62, 33, 0.55);
+  --secondary-glow: rgba(255, 138, 0, 0.35);
+  --handle-color: rgba(255, 255, 255, 0.45);
+  --status-active: #4ade80;
+  --detail-muted: rgba(255, 255, 255, 0.55);
+}
+
+/* ─── Card wrapper ────────────────────────────────────────── */
+.pc-card-wrapper {
+  perspective: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--card-w);
+  height: var(--card-h);
+}
+
+.pc-card {
+  position: relative;
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  cursor: pointer;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  transition: box-shadow 0.4s ease;
+}
+
+.pc-card:hover {
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.7),
+    0 0 40px var(--primary-glow),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+}
+
+/* ─── Behind-card glow (rendered behind the card) ─────────── */
+.pc-behind-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: calc(var(--card-radius) + 30px);
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    var(--primary-glow) 0%,
+    var(--secondary-glow) 35%,
+    transparent 70%
+  );
+  filter: blur(28px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.pc-card-wrapper:hover .pc-behind-glow {
+  opacity: 1;
+}
+
+/* ─── Avatar section (top half of card) ───────────────────── */
+.pc-avatar-content {
+  position: relative;
+  width: 100%;
+  height: 58%;
+  overflow: hidden;
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+
+/* Standard rectangular/JPEG/PNG photo — fill the space cleanly */
+.pc-avatar-content .avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  display: block;
+  /* No mix-blend-mode so the photo renders in full original colours */
+}
+
+/* Gradient overlay that fades the photo into the card body */
+.pc-avatar-content::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 55%,
+    var(--card-bg) 100%
+  );
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+  pointer-events: none;
+}
+
+/* Fallback initials avatar when no image is provided */
+.pc-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #d03e21 0%, #ff8a00 100%);
+  font-size: 4rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -2px;
+}
+
+/* ─── Mouse-following glow inside the card ─────────────────── */
+.pc-shine {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 60%
+  );
+  border-radius: var(--card-radius);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: 10;
+}
+
+.pc-card:hover .pc-shine {
+  opacity: 1;
+}
+
+/* ─── Bottom info area ─────────────────────────────────────── */
+.pc-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 18px 20px 20px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Mini avatar circle in the info bar */
+.pc-mini-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(208, 62, 33, 0.7);
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px rgba(208, 62, 33, 0.4);
+}
+
+.pc-mini-avatar-fallback {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid rgba(208, 62, 33, 0.7);
+  background: linear-gradient(135deg, #d03e21, #ff8a00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  flex-shrink: 0;
+}
+
+.pc-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pc-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.pc-title {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--detail-muted);
+  margin: 0;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pc-handle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.pc-handle {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.8rem;
+  color: var(--handle-color);
+  letter-spacing: 0.01em;
+}
+
+.pc-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.72rem;
+  color: var(--status-active);
+  font-weight: 500;
+}
+
+.pc-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--status-active);
+  box-shadow: 0 0 6px var(--status-active);
+  animation: pc-pulse 2s ease-in-out infinite;
+}
+
+@keyframes pc-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* ─── Card noise/grain texture for depth ──────────────────── */
+.pc-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 120px;
+  border-radius: var(--card-radius);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+}
+
+/* ─── Responsive tweaks ────────────────────────────────────── */
+@media (max-width: 480px) {
+  :root {
+    --card-w: 260px;
+    --card-h: 350px;
+  }
+}
