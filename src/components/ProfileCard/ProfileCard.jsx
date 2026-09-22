@@ -15,7 +15,6 @@ import "./ProfileCard.css";
  * name            string   – displayed name
  * title           string   – role / year / school line
  * handle          string   – @handle or roll number
- * status          string   – e.g. "Active" (shows green dot)
  * avatarUrl       string   – full-size Cloudinary profile URL
  * miniAvatarUrl   string   – thumbnail URL (same as avatarUrl is fine)
  * behindGlowEnabled boolean – renders ambient glow behind card
@@ -25,7 +24,7 @@ const ProfileCard = ({
   name = "",
   title = "",
   handle = "",
-  status = "Active",
+  status,
   avatarUrl = "",
   miniAvatarUrl = "",
   behindGlowEnabled = true,
@@ -126,24 +125,8 @@ const ProfileCard = ({
         {/* ── Bottom info bar ── */}
         <div className="pc-info">
           <div className="pc-name-row">
-            {/* Mini circular avatar */}
-            {miniAvatarUrl ? (
-              <img
-                src={miniAvatarUrl}
-                alt=""
-                className="pc-mini-avatar"
-                draggable={false}
-                aria-hidden="true"
-              />
-            ) : (
-              <div className="pc-mini-avatar-fallback" aria-hidden="true">
-                {initials}
-              </div>
-            )}
-
             <div>
               <p className="pc-name">{name || "FED Member"}</p>
-              {title && <p className="pc-title">{title}</p>}
             </div>
           </div>
 
@@ -151,12 +134,7 @@ const ProfileCard = ({
             {handle && (
               <span className="pc-handle">@{handle}</span>
             )}
-            {status && (
-              <span className="pc-status">
-                <span className="pc-status-dot" />
-                {status}
-              </span>
-            )}
+
           </div>
         </div>
       </div>

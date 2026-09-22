@@ -12,11 +12,10 @@ import AuthContext from "../../../context/AuthContext";
 import { isAttendanceScanner } from "@/lib/auth/attendance";
 import styles from "./styles/Sidebar.module.scss";
 
-import defaultImg from "../../../assets/images/defaultImg.jpg";
-import camera from "../../../assets/images/camera.svg";
 import { EditImage } from "../../../features";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ProfileCard from "../../../components/ProfileCard/ProfileCard";
 
 
 const Sidebar = ({ activepage, handleChange }) => {
@@ -271,58 +270,40 @@ const Sidebar = ({ activepage, handleChange }) => {
     <>
       <div className={styles.sidebar}>
         <div className={styles.profile}>
-          <div
-            style={{ width: "auto", position: "relative", cursor: "pointer" }}
-            onClick={() => handleMenuClick("Profile")}
-          >
-            <Link href={"/profile"}>
-              <img
-                src={authCtx.user.img || imagePrv || defaultImg.src}
-                alt="Profile"
-                className={styles.profilePhoto}
-              />
-            </Link>
-
-            {selectedFile && (
-              <EditImage
-                selectedFile={selectedFile}
-                closeModal={closeModal}
-                setimage={setImage}
-                updatePfp={true}
-                setFile={setSelectedFile}
-              />
-            )}
-            {!isAttendanceOnly && (
-              <>
-                <div
-                  style={{ position: "absolute", bottom: "5px", right: "5px", cursor: "pointer" }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    imgRef.current?.click();
-                  }}
-                  title="Update profile picture"
-                >
-                  <img src={camera.src} alt="camera" />
-                </div>
-                <input
-                  style={{
-                    display: "none",
-                  }}
-                  type="file"
-                  ref={imgRef}
-                  accept="image/png, image/jpeg, image/jpg, image/webp"
-                  onChange={handleFileChange}
-                />
-              </>
-            )}
+          {/* ProfileCard replaces the old avatar + name/role block */}
+          <div className={styles.profileCardContainer}>
+            <ProfileCard
+              name={authCtx.user?.name}
+              title={authCtx.user?.role || authCtx.user?.year || 'Member'}
+              handle={authCtx.user?.roll || authCtx.user?.email?.split('@')[0]}
+              status="Active"
+              avatarUrl={imagePrv || authCtx.user?.img || ''}
+              miniAvatarUrl={authCtx.user?.img || ''}
+              showUserInfo={true}
+              behindGlowEnabled={true}
+              enableTilt={true}
+            />
           </div>
 
-          <div className={styles.profileInfo}>
-            <Link href={"/profile"}>
-              <p className={styles.name}>{handleName()}</p>
-            </Link>
-            <p className={styles.role}>{designation}</p>
-          </div>
+          {/* Hidden file input + modal for profile picture upload */}
+          {selectedFile && (
+            <EditImage
+              selectedFile={selectedFile}
+              closeModal={closeModal}
+              setimage={setImage}
+              updatePfp={true}
+              setFile={setSelectedFile}
+            />
+          )}
+          {!isAttendanceOnly && (
+            <input
+              style={{ display: "none" }}
+              type="file"
+              ref={imgRef}
+              accept="image/png, image/jpeg, image/jpg, image/webp"
+              onChange={handleFileChange}
+            />
+          )}
         </div>
         
         <div 

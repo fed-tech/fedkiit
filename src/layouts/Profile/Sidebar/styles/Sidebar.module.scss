@@ -15,8 +15,17 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
-  margin-top: 40px;
-  // margin-bottom: auto;
+  margin-top: 24px;
+}
+
+.profileCardContainer {
+  width: 100%;
+  max-width: 210px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(0.92);
+  transform-origin: top center;
 }
 
 .divider {

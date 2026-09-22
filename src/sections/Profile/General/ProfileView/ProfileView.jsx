@@ -8,7 +8,6 @@ import { EditProfile } from "../../../../features";
 import { ComponentLoading } from "../../../../microInteraction";
 import PropTypes from "prop-types";
 import { Alert } from "../../../../microInteraction";
-import ProfileCard from "../../../../components/ProfileCard/ProfileCard";
 
 const formatUrl = (url) => {
   const trimmed = (url || "").trim();
@@ -18,26 +17,6 @@ const formatUrl = (url) => {
   return `https://${trimmed}`;
 };
 
-/**
- * Derives a human-readable title string from AuthContext user fields.
- * Priority: designation (for team members) → year → school → "Member"
- */
-const deriveTitle = (user) => {
-  if (user?.extra?.designation) return user.extra.designation;
-  if (user?.year) return `Year ${user.year}`;
-  if (user?.school) return user.school;
-  return "Member";
-};
-
-/**
- * Derives the handle shown on the ProfileCard.
- * Priority: rollNumber → part of email before '@'
- */
-const deriveHandle = (user) => {
-  if (user?.rollNumber) return user.rollNumber;
-  if (user?.email) return user.email.split("@")[0];
-  return "";
-};
 
 const Profile = ({ editmodal }) => {
   const authCtx = useContext(AuthContext);
@@ -125,20 +104,6 @@ const Profile = ({ editmodal }) => {
           <ComponentLoading />
         ) : (
           <>
-            {/* ── Interactive ProfileCard ─────────────────────── */}
-            <div className={styles.profileCardWrapper}>
-              <ProfileCard
-                name={authCtx.user.name}
-                title={deriveTitle(authCtx.user)}
-                handle={deriveHandle(authCtx.user)}
-                status="Active"
-                avatarUrl={authCtx.user.img || ""}
-                miniAvatarUrl={authCtx.user.img || ""}
-                behindGlowEnabled={true}
-                enableTilt={true}
-              />
-            </div>
-
             {/* ── Details table ──────────────────────────────── */}
             <div className={styles.details}>
               <div className={styles.profileBox}>
