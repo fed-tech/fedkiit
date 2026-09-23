@@ -38,9 +38,9 @@ const Chatbot = () => {
     // Generate personalized greeting message
     const getGreetingMessage = () => {
         if (userName) {
-            return `Hi **${userName}**! I'm **${chatbotName}**, your event-focused assistant for FED KIIT. 🚀 How can I help you today?`;
+            return `Hi **${userName}**! I'm **${chatbotName}**, your assistant for FED KIIT. 🚀 How can I help you today?`;
         }
-        return `Hello! I'm **${chatbotName}**, your event-focused assistant for FED KIIT. 🚀 How can I help you today?`;
+        return `Hello! I'm **${chatbotName}**, your assistant for FED KIIT. 🚀 How can I help you today?`;
     };
 
     const [messages, setMessages] = useState([
@@ -441,25 +441,12 @@ const Chatbot = () => {
             recognitionRef.current?.stop();
             setIsListening(false);
         } else {
-            // Explicitly trigger the native browser permission dialog popup ([Allow] [Block])
-            try {
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    // Release temporary stream so SpeechRecognition can access the microphone cleanly
-                    stream.getTracks().forEach(track => track.stop());
-                }
-            } catch (err) {
-                console.warn('[Microphone Permission Denied]', err);
-                alert('Microphone access is required to use voice input. Please click Allow when prompted by your browser.');
-                return;
-            }
-
             const recognition = new SpeechRecognition();
             recognitionRef.current = recognition;
 
             recognition.continuous = false;
             recognition.interimResults = true;
-            recognition.lang = 'en-US';
+            recognition.lang = typeof navigator !== 'undefined' && navigator.language ? navigator.language : 'en-US';
 
             recognition.onstart = () => {
                 setIsListening(true);
@@ -478,10 +465,13 @@ const Chatbot = () => {
 
             recognition.onerror = (event) => {
                 setIsListening(false);
+                console.warn('[Speech Recognition Error]', event.error);
                 if (event.error === 'not-allowed') {
-                    alert('Microphone access was denied. Please enable microphone permissions in your browser address bar to use voice input.');
-                } else if (event.error !== 'no-speech') {
-                    console.warn('[Speech Recognition Info]', event.error);
+                    alert('Microphone access was denied. If allowed in the browser address bar, ensure Windows Settings > Privacy & security > Microphone > "Let desktop apps access your microphone" is turned ON.');
+                } else if (event.error === 'service-not-allowed' || event.error === 'network') {
+                    alert('Speech service unavailable. If using Brave Browser, enable "Use Google services for speech recognition" in brave://settings/privacy.');
+                } else if (event.error === 'audio-capture') {
+                    alert('No microphone was detected, or another application is using it in exclusive mode.');
                 }
             };
 
@@ -620,7 +610,7 @@ const Chatbot = () => {
                             <div className={styles.headerText}>
                                 <h2 className={styles.title}>{chatbotName}</h2>
                                 <p className={styles.subtitle}>
-                                    <IoSparkles size={12} /> Event Assistant
+                                    <IoSparkles size={12} /> AI Assistant
                                 </p>
                             </div>
                         </div>
@@ -631,14 +621,14 @@ const Chatbot = () => {
                                 title="Reset Conversation"
                                 aria-label="Reset Conversation"
                             >
-                                <IoRefreshOutline size={20} />
+                                <IoRefreshOutline size={18} />
                             </button>
                             <button
                                 className={styles.closeButton}
                                 onClick={toggleChatbot}
                                 aria-label="Close Chat"
                             >
-                                <IoCloseOutline size={26} />
+                                <IoCloseOutline size={20} />
                             </button>
                         </div>
                     </header>
@@ -739,7 +729,7 @@ const Chatbot = () => {
                                 title={isListening ? "Stop listening" : "Start voice input"}
                                 aria-label={isListening ? "Stop listening" : "Start voice input"}
                             >
-                                {isListening ? <IoMicOff size={20} /> : <IoMic size={20} />}
+                                {isListening ? <IoMicOff size={18} /> : <IoMic size={18} />}
                             </button>
                             <button
                                 type="submit"
@@ -747,7 +737,7 @@ const Chatbot = () => {
                                 disabled={!userInput.trim() || isTyping}
                                 aria-label="Send Message"
                             >
-                                <IoSend size={18} />
+                                <IoSend size={16} />
                             </button>
                         </form>
                     </div>

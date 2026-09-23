@@ -289,21 +289,32 @@ $mobile: 480px;
 .headerActions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .iconHeaderBtn,
 .closeButton {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: $text-secondary;
     border-radius: 10px;
-    padding: 6px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    vertical-align: middle;
     cursor: pointer;
     transition: all 0.2s ease;
+
+    svg {
+        display: block;
+        flex-shrink: 0;
+    }
 
     &:hover {
         background: rgba(255, 255, 255, 0.14);
@@ -544,23 +555,31 @@ $mobile: 480px;
 }
 
 .inputForm {
+    box-sizing: border-box;
     display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: center;
     gap: 8px;
     width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .inputField {
+    box-sizing: border-box;
     flex: 1;
     min-width: 0;
     height: 42px;
     padding: 0 14px;
     background: rgba(255, 255, 255, 0.07);
     border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 14px;
+    border-radius: 12px;
     color: #ffffff;
     font-size: 0.86rem;
+    line-height: 40px;
     font-family: inherit;
+    margin: 0;
     transition: all 0.2s ease;
 
     &::placeholder {
@@ -577,16 +596,24 @@ $mobile: 480px;
 
 .micButton,
 .sendButton {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
     flex-shrink: 0;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
-    border: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    vertical-align: middle;
     cursor: pointer;
     transition: all 0.2s ease;
+
+    svg {
+        display: block;
+        flex-shrink: 0;
+    }
 }
 
 .micButton {
@@ -601,6 +628,7 @@ $mobile: 480px;
 
     &.listening {
         background: $primary-gradient;
+        border-color: transparent;
         color: #ffffff;
         animation: pulse 1.5s infinite;
     }
@@ -608,12 +636,17 @@ $mobile: 480px;
 
 .sendButton {
     background: $primary-gradient;
+    border: 1px solid transparent;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(255, 85, 0, 0.35);
+    box-shadow: 0 2px 8px rgba(255, 85, 0, 0.35);
+
+    svg {
+        margin-left: 2px;
+    }
 
     &:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 6px 18px rgba(255, 85, 0, 0.5);
+        box-shadow: 0 4px 14px rgba(255, 85, 0, 0.5);
     }
 
     &:disabled {
