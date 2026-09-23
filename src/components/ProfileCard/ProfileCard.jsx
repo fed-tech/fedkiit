@@ -132,7 +132,7 @@ const ProfileCard = ({
 
           <div className="pc-handle-row">
             {handle && (
-              <span className="pc-handle">@{handle}</span>
+              <span className="pc-handle">{handle}</span>
             )}
 
           </div>
