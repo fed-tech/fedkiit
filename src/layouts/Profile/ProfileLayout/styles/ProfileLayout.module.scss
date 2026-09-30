@@ -1,28 +1,43 @@
 .main {
-  height: 100%;
+  min-height: 100vh;
   width: 100%;
-  background-color: #1c1c1c;
+  background-color: #070709;
+  background-image: 
+    radial-gradient(circle at 14% 42%, rgba(249, 115, 22, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 86% 20%, rgba(234, 88, 12, 0.04) 0%, transparent 40%);
   position: relative;
   overflow: hidden;
+  color: #ffffff;
 }
 
-.frameMiddle {
-  height: 20vw;
-  width: 15vw;
-  background-color: #ff5e00a7;
-  filter: blur(100px);
+.glowTopLeft {
   position: absolute;
-  top: 40%;
-  right: -8%;
-  border-radius: 50%;
-}
-.frameBottom {
-  height: 20vw;
-  width: 15vw;
-  background-color: #ff5e00a7;
-  filter: blur(100px);
-  position: absolute;
-  bottom: -26%;
+  top: 15%;
   left: -8%;
-  border-radius: 50%;
+  width: 36vw;
+  height: 36vw;
+  max-width: 480px;
+  max-height: 480px;
+  background: radial-gradient(circle, rgba(255, 94, 0, 0.06) 0%, rgba(0, 0, 0, 0) 70%);
+  pointer-events: none;
+  filter: blur(60px);
+}
+
+.glowBottomRight {
+  position: absolute;
+  bottom: 5%;
+  right: -5%;
+  width: 32vw;
+  height: 32vw;
+  max-width: 420px;
+  max-height: 420px;
+  background: radial-gradient(circle, rgba(255, 138, 0, 0.035) 0%, rgba(0, 0, 0, 0) 70%);
+  pointer-events: none;
+  filter: blur(60px);
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
 }

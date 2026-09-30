@@ -1,261 +1,306 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-
 .sidebar {
   display: flex;
-  height: 100vh;
   flex-direction: column;
-  width: 34%;
-  position: relative;
+  width: 290px;
+  flex-shrink: 0;
+  gap: 18px;
+  box-sizing: border-box;
 }
 
-
-.profile {
+// Card container
+.card {
+  background: #111115;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 30px 22px 26px 22px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
-  margin-top: 40px;
-  // margin-bottom: auto;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-.divider {
-  height: 90%;
-  width: 1.6px;
+.profileGlowCard {
+  width: 100%;
+}
+
+.cardContent {
+  width: 100%;
+  padding: 30px 22px 26px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+// Avatar squircle with glowing orange border and frosted glass depth
+.avatarWrapper {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  border-radius: 26px;
+  border: 2px solid #ff7a18;
+  box-shadow: 
+    0 0 24px rgba(255, 122, 24, 0.35),
+    inset 0 0 16px rgba(255, 122, 24, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 0 32px rgba(255, 122, 24, 0.45),
+      inset 0 0 20px rgba(255, 122, 24, 0.2);
+  }
+}
+
+.statusDot {
   position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  background-color: #fff !important;
+  top: -2px;
+  left: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #111115;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+  z-index: 2;
 }
 
 .profilePhoto {
-  width: 148px;
-  height: 148px;
-  border-radius: 19px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  border-radius: 24px;
 }
 
-.profileInfo {
-  text-align: center;
-  display: grid;
+.avatarInitials {
+  font-size: 38px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  font-family: inherit;
+  user-select: none;
+}
+
+// Camera badge with glowing contrast pop
+.cameraBadge {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #18181b;
+  color: #ff7a18;
+  border: 2px solid #ff7a18;
+  display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 122, 24, 0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  z-index: 2;
 
-  a {
-    text-decoration: none;
+  &:hover {
+    transform: scale(1.15);
+    background: #ff7a18;
+    color: #ffffff;
+    box-shadow: 0 4px 18px rgba(255, 122, 24, 0.6);
+  }
+
+  svg {
+    stroke-width: 2.2px;
   }
 }
 
-.name {
-  color: rgb(255, 255, 255);
-  font-size: 25px;
-  font-weight: 600;
+// User name & role
+.userName {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  line-height: 1.25;
+  word-break: break-word;
 }
 
-.role {
-  font-family: "Poppins";
-  font-size: 13px;
-  opacity: 0.8;
+.roleBadge {
   margin-top: 6px;
-  color: rgba(255, 255, 255, 0.605);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 999px;
+  padding: 3px 14px;
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+  display: inline-block;
 }
 
-.menu {
+// Profile completion section
+.completionSection {
   width: 100%;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.completionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  color: #82828e;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.completionCount {
+  color: #e4e4e7;
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: #202027;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff4d29, #ff8c2b);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.completionHint {
+  font-size: 12px;
+  color: #71717a;
+  margin: 0;
+  line-height: 1.4;
+}
+
+// Menu card
+.menuCard {
+  background: #111115;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: auto;
-  // background-color: red;
-  padding-left: 18%;
+  gap: 4px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
-
-.menu div {
-  width: 60%;
-  font-family: "Poppins";
-  // background-color: pink;
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 14.5px;
   font-weight: 500;
+  color: #9ca3af;
+  background: transparent;
+  border: 1px solid transparent;
   cursor: pointer;
-  font-size: 20px;
-  gap: 4.06px;
-  padding: 12px 0px;
-  transition: background-color 0.3s;
+  text-align: left;
+  transition: all 0.15s ease;
+
+  svg {
+    color: #9ca3af;
+    transition: color 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+
+    svg {
+      color: #ffffff;
+    }
+  }
+}
+
+.menuItemActive {
   display: flex;
-  flex-direction: row;
   align-items: center;
-}
-
-.menu div a {
-  color: inherit;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   cursor: pointer;
-  text-decoration: none;
+  text-align: left;
+
+  svg {
+    color: #ff7a18 !important;
+    flex-shrink: 0;
+  }
 }
 
-.menuItem:hover {
-  background-color: #ffffff;
-}
-
-.buttonContainer {
-  display: flex;
-  justify-content: left;
-  gap: 0.658rem;
-  margin-top: -49.82rem;
-  margin-left: 427px;
-}
-
-.button {
-  padding: 10px 20px;
-  height: 46.2px;
-  width: 132.14px;
-  font-family: "Poppins";
-  font-size: 0.943rem;
-  border-radius: 3.95px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+.logoutItem {
+  color: #9ca3af;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 
   &:hover {
-    opacity: 0.9;
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.08);
+
+    svg {
+      color: #f87171;
+    }
   }
 }
 
-.viewEvents {
-  background-color: transparent;
-  color: white;
-  border: 2px solid white;
-
-  &:hover {
-    background-color: #333;
-  }
-
-  &:active {
-    background-color: #919191;
-    color: #ff8a00;
-  }
-}
-
-.addEvent {
-  background-color: transparent;
-  color: white;
-  border: 2px solid white;
-
-  &:hover {
-    background-color: #cc7a00;
-  }
-
-  &:active {
-    background-color: #919191;
-    color: #ff8a00;
-  }
-}
-
+// Mobile toggle
 .mobileMenuToggle {
   display: none;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 900px) {
   .sidebar {
     width: 100%;
-    height: auto;
   }
 
   .mobileMenuToggle {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 90%;
-    margin: 10px auto;
-    padding: 14px 22px;
-    background: rgba(0, 0, 0, 0.35);
-    /* Grey-tinted */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(113, 113, 113, 0.405);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-    border-radius: 14px;
-    color: white;
-    font-family: "Poppins", sans-serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    /* Bold text */
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .mobileMenuToggle:hover {
-    background: rgba(148, 148, 148, 0.014);
-  }
-
-  .menu {
-    flex-direction: column;
-    width: 90%;
-    margin: 0 auto;
-    padding-left: 0px;
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.4s ease-in-out;
-    opacity: 0;
-  }
-
-  .menuOpen {
-    max-height: 800px;
-    opacity: 1;
-    margin-bottom: 20px;
-  }
-
-  .menu div {
     width: 100%;
-    margin: 5px 0;
-    padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 10px;
+    padding: 12px 16px;
+    background: #111115;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
   }
 
-  .menu div:hover {
-    background: rgba(255, 255, 255, 0.08);
+  .menuCard {
+    display: none;
+
+    &.menuOpen {
+      display: flex;
+    }
   }
-
-  .divider {
-    width: 30%;
-    height: 1px;
-    bottom: -10px;
-    left: 0;
-    right: 0;
-    margin: auto auto 0 auto;
-  }
-}
-
-@media screen and (max-width: 1025px) {
-
-  .sidebar {
-    height: 61.5vh;
-  }
-}
-
-@media screen and (max-width: 916px) {
-
-  .sidebar {
-    height: 71vh;
-  }
-
-}
-
-@media screen and (max-width: 801px) {
-
-  .sidebar {
-    height: 60vh;
-  }
-
-}
-
-@media screen and (max-width: 769px) {
-
-  .sidebar {
-    height: auto;
-  }
-
 }

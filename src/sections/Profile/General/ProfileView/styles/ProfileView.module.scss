@@ -1,229 +1,229 @@
-#profile {
-  color: #ffffff;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 300;
+.profileContainer {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  padding-left: 0px;
-  padding-top: 35px;
-  padding-bottom: 27px;
-}
-  
-.proHeading {
-  font-size: 30px;
-  letter-spacing: 0.02em;
-  line-height: 40px;
-  padding-bottom: 50px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  box-sizing: border-box;
 }
 
-.headInnerText{
-  margin-left: 10rem;
+// Top Page Header
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 28px;
+  gap: 20px;
 }
-  
-.headInnerText span{
-  margin-right: 3px;
-  background: linear-gradient(to right , #d03e21 40%, #FF8A00 );
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+}
+
+.pageTitle {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.gradientHighlight {
+  background: linear-gradient(135deg, #ff4d26 0%, #ff8c2b 100%);
   -webkit-background-clip: text;
   color: transparent;
-  
+  margin-right: 2px;
 }
-  
-.details{
-  display: flex;
-  justify-content: start;
-  align-items: center;
+
+.pageSubtitle {
+  color: #71717a;
+  font-size: 14px;
+  margin: 6px 0 0 0;
+}
+
+.editBtn {
+  background: linear-gradient(135deg, #ff4d26 0%, #ff7e1d 100%);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 87, 34, 0.28);
+  transition: filter 0.15s ease, transform 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Card Containers
+.card {
+  background: #111115;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 26px 28px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.glowCard {
   width: 100%;
-  // background-color: red;
-  margin-left: 10rem;
-
+  margin-bottom: 20px;
 }
 
-// .profileBox{
-
-//   width: 700px;
-//   display: flex;
-// }
-
-.profileTable {
-  table-layout: fixed;
-  width: 70%;
+.cardContent {
+  width: 100%;
+  padding: 26px 28px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
-.vals {
-  font-family: "Open Sans", sans-serif;
-  font-size: 20px;
-  padding-bottom: 27px;
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+}
 
-  &.highlight {
-    max-width: 50%;
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    white-space: nowrap; 
-  }
+.cardTitle {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3;
+}
 
-  &.highlight:hover{
-    overflow: scroll;
-    text-overflow: clip;
-  }
+.cardSubtitle {
+  color: #71717a;
+  font-size: 13.5px;
+  margin: 4px 0 0 0;
+}
 
-  &.highlight::-webkit-scrollbar{
-    display: none;
+// Field Grids
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.fieldsGridSingle {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 22px;
+}
+
+// Field Box
+.fieldBox {
+  background: #15151a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 72px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    background-color: #18181f;
   }
 }
 
-.dets{
-  font-family: "Open Sans", sans-serif;
-  font-size: 20px;
-  padding-bottom: 27px;
-  width:35%;
-  font-weight: 700;
+.fieldIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ff7a18;
+
+  svg {
+    stroke-width: 1.9px;
+  }
 }
 
+.fieldContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
 
-  .dets {
-    padding-right: 100px;
-  }
+.fieldLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #71717a;
+  margin-bottom: 3px;
+}
 
-  .editbtn{
-    font-size: 1.6rem;
-    margin-right: 13rem;
-    cursor: pointer;
-    display: flex;
-    align-items: end;
-  }
-  
-  @media screen and (max-width:989px) {
-    .details{
-      width: 90%;
-      margin-left: 5rem;
-    }
+.fieldValue {
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
-    .headInnerText{
-      margin-left: 5rem;
-    }
+  a {
+    color: #ff8c2b;
+    text-decoration: none;
+    transition: color 0.15s ease;
 
-    .editbtn{
-      margin-right: 5rem;
-    }
-  }
-  
-  @media screen and (max-width:867px) {
-    .details{
-      width: 90%;
-      margin-left: 2rem;
-    }
-
-    .headInnerText{
-      margin-left: 2rem;
-    }
-
-    .editbtn{
-      margin-right: 2rem;
+    &:hover {
+      text-decoration: underline;
+      color: #ffa34f;
     }
   }
+}
 
-  @media screen and (max-width:769px) {
-    .proHeading{
-      display: grid;
-      grid-template-columns: 15% 70% 15%;
-    }
+.addValueBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #ff7a18;
+  font-size: 14.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: opacity 0.15s ease;
+  font-family: inherit;
 
-    .headInnerText{
-      grid-column-start: 2;
-      grid-column-end: 3;
-      text-align: center;
-      margin-left: 0px;
-    }
-
-    .editbtn{
-      margin-right: 0rem;
-      margin-left: 20%;
-    }
-
-    .details{
-      justify-content: center;
-      width: 95%;
-      margin-left: 1rem;
-      margin-right: 1rem;
-    }
-
-    .dets{
-      width:50%;
-      padding-left: 2rem;
-    }
-
+  &:hover {
+    opacity: 0.85;
+    text-decoration: underline;
   }
-  
-  @media screen and (max-width:480px) {
-    #profile {
-      padding-left: 15px;
-      padding-right: 15px;
-    }
+}
 
-    .proHeading{
-      display: grid;
-      grid-template-columns: 12.5% 65% 10% 12.5%;
-      margin-left: -1.1rem;
-    }
-
-    .headInnerText{
-      font-size: 30px;
-      text-align: start;
-      grid-column-start: 2;
-      grid-column-end: 3;
-    }
-
-    .editbtn{
-      font-size: 20px;
-      text-align: end;
-      grid-column-start: 3;
-      grid-column-end: 4;
-    }
-  
-    .dets {
-      padding-right: 50px;
-    }
-
-    .profileTable{
-      width: 100%;
-      margin-left: -2%;
-    }
-
+@media screen and (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
 
-  @media screen and (max-width:430px) {
-  .dets,
-  .vals {
-    font-size: 16px;
+  .card {
+    padding: 20px 18px;
   }
 
-  .proHeading{
-    display: grid;
-    grid-template-columns: 7.5% 70% 15% 7.5%;
-    margin-left: 0.8rem;
+  .fieldsGrid,
+  .fieldsGridSingle {
+    grid-template-columns: 1fr;
   }
-  }
-
-  @media screen and (max-width:380px) {
-    
-    .dets {
-      padding-right: 30px;
-    }
-
-    .proHeading{
-      display: grid;
-      grid-template-columns: 5% 80% 15%;
-      margin-left: 10px;
-    }
-
-    .profileTable{
-      margin-left: -20px;
-    }
-    
-  }
-  
-  
+}
