@@ -131,7 +131,9 @@ const ProfileView = () => {
                   </div>
                   <div className={styles.fieldContent}>
                     <span className={styles.fieldLabel}>FULL NAME</span>
-                    <span className={styles.fieldValue}>{user.name || "N/A"}</span>
+                    <span className={styles.fieldValue} title={user.name}>
+                      {user.name || "N/A"}
+                    </span>
                   </div>
                 </div>
 
@@ -177,7 +179,9 @@ const ProfileView = () => {
                   <div className={styles.fieldContent}>
                     <span className={styles.fieldLabel}>ROLL NUMBER</span>
                     {user.rollNumber ? (
-                      <span className={styles.fieldValue}>{user.rollNumber}</span>
+                      <span className={styles.fieldValue} title={user.rollNumber}>
+                        {user.rollNumber}
+                      </span>
                     ) : (
                       <button
                         type="button"
@@ -198,7 +202,9 @@ const ProfileView = () => {
                   <div className={styles.fieldContent}>
                     <span className={styles.fieldLabel}>YEAR</span>
                     {user.year ? (
-                      <span className={styles.fieldValue}>{user.year}</span>
+                      <span className={styles.fieldValue} title={user.year}>
+                        {user.year}
+                      </span>
                     ) : (
                       <button
                         type="button"
@@ -219,7 +225,9 @@ const ProfileView = () => {
                   <div className={styles.fieldContent}>
                     <span className={styles.fieldLabel}>SCHOOL</span>
                     {user.school ? (
-                      <span className={styles.fieldValue}>{user.school}</span>
+                      <span className={styles.fieldValue} title={user.school}>
+                        {user.school}
+                      </span>
                     ) : (
                       <button
                         type="button"
@@ -240,7 +248,9 @@ const ProfileView = () => {
                   <div className={styles.fieldContent}>
                     <span className={styles.fieldLabel}>COLLEGE</span>
                     {user.college ? (
-                      <span className={styles.fieldValue}>{user.college}</span>
+                      <span className={styles.fieldValue} title={user.college}>
+                        {user.college}
+                      </span>
                     ) : (
                       <button
                         type="button"
@@ -282,7 +292,9 @@ const ProfileView = () => {
                   <div className={styles.fieldContent}>
                     <span className={styles.fieldLabel}>MOBILE NO</span>
                     {user.contactNo ? (
-                      <span className={styles.fieldValue}>{user.contactNo}</span>
+                      <span className={styles.fieldValue} title={user.contactNo}>
+                        {user.contactNo}
+                      </span>
                     ) : (
                       <button
                         type="button"
@@ -384,7 +396,7 @@ const ProfileView = () => {
                       </div>
                       <div className={styles.fieldContent}>
                         <span className={styles.fieldLabel}>DESIGNATION</span>
-                        <span className={styles.fieldValue}>
+                        <span className={styles.fieldValue} title={user.extra.designation}>
                           {user.extra.designation}
                         </span>
                       </div>
