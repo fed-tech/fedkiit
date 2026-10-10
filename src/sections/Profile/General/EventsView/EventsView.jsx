@@ -29,23 +29,26 @@ const Events = () => {
   const analyticsAccessRoles = FORM_ANALYTICS_ROLES_CLIENT;
 
   useEffect(() => {
+    if (!authCtx.token) return;
+
     const fetchEventsData = async () => {
       try {
-        const response = await api.get("/api/form/getAllForms");
-        const userEvents = authCtx.user.regForm;
+        const [response, attendanceResponse] = await Promise.all([
+          api.get("/api/form/getAllForms"),
+          fetch("/api/attendance/myAttendance", {
+            headers: { Authorization: `Bearer ${authCtx.token}` }
+          })
+        ]);
+
+        const attendanceData = await attendanceResponse.json();
+        const attendedIds = attendanceData.success ? attendanceData.formIds : [];
 
         if (response.status === 200) {
           let fetchedEvents = response.data.events;
-          if (authCtx.user.access !== "USER") {
-            // Set events for non-users
-            setEvents(sortEventsByDate(fetchedEvents));
-          } else {
-            // Filter and then sort events for users
-            const filteredEvents = fetchedEvents.filter((event) =>
-              userEvents.includes(event.id)
-            );
-            setEvents(sortEventsByDate(filteredEvents));
-          }
+          const filteredEvents = fetchedEvents.filter((event) =>
+            attendedIds.includes(event.id)
+          );
+          setEvents(sortEventsByDate(filteredEvents));
         } else {
           console.error("Error fetching event data:", response.data.message);
           setError({
@@ -58,71 +61,35 @@ const Events = () => {
           message:
             "Sorry for the inconvenience, we are having issues fetching your Events",
         });
-        console.error("Error fetching team members:", error);
-
-        // const userEvents = authCtx.user.regForm;
-        // // using local JSON data
-        // let localEvents = eventsData.events;
-        // if (authCtx.user.access !== "USER") {
-        //   setEvents(sortEventsByDate(localEvents));
-        // } else {
-        //   const filteredEvents = localEvents.filter((event) =>
-        // userEvents.includes(event._id);
-        //   );
-        //   setEvents(sortEventsByDate(filteredEvents));
-        // }
+        console.error("Error fetching events:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchEventsData();
-  }, [authCtx.user.email]);
+  }, [authCtx.token]);
 
   useEffect(() => {
-    // Not admin-gated. This is the participant's own certificate list, and the
-    // endpoint now authorises "your own email, or any email if you are an
-    // admin" — gating it here left every ordinary member with an empty list and
-    // a View button that led nowhere.
-    const fetchCertificates = async () => {
-      if (!authCtx.user?.email) return;
+    if (!authCtx.token) return;
 
+    async function fetchCertificates() {
       try {
-        const response = await api.post(
-          "/api/certificate/sendCertificatesAndEvents",
-          {
-            email: authCtx.user.email,
-          },
-          {
-            headers: { Authorization: `Bearer ${authCtx.token}` },
+        const res = await fetch("/api/certificate/myCertificates", {
+          headers: {
+            Authorization: `Bearer ${authCtx.token}`
           }
-        );
-        if (response.status === 200) {
-          setCertificates(response.data.certandevent);
-        }
+        });
+
+        const data = await res.json();
+        setCertificates(data);
       } catch (err) {
         console.error("Error fetching certificates:", err);
       }
-    };
+    }
 
     fetchCertificates();
-  }, [authCtx.user?.email, authCtx.token]);
-
-  /**
-   * Certificates are issued against an `Event`, while this table lists forms,
-   * so the two are matched on the `formId` the Event carries.
-   *
-   * This used to call `accessOrCreateEventByFormId`, which posts to
-   * /api/certificate/getEventByFormId and falls back to
-   * /api/certificate/createOrganisationEvent. Neither route was ever ported, so
-   * every lookup 404'd, threw on `eid.id`, and left the map empty — a second,
-   * independent reason the View button led nowhere. The joined event now comes
-   * back with the certificate itself, so no extra request is needed.
-   */
-  const getCertificateForEvent = (formId) => {
-    const found = certificates.find((item) => item.event?.formId === formId);
-    return found ? found.cert : null;
-  };
+  }, [authCtx.token]);
 
   const sortEventsByDate = (events) => {
     return events.sort(
@@ -137,17 +104,14 @@ const Events = () => {
       .replace(/\//g, "-");
   };
 
-  // Pure lookups against data already in hand, so this is a plain synchronous
-  // pass rather than one request per event.
   useEffect(() => {
     const map = {};
-    for (const event of events) {
-      const cert = getCertificateForEvent(event.id);
-      if (cert) map[event.id] = `/verify/certificate?id=${cert.id}`;
-    }
+    certificates?.forEach(cert => {
+      map[cert.formId] = cert;
+    });
     setCertMap(map);
     setLoadingCerts(false);
-  }, [events, certificates]);
+  }, [certificates]);
 
   return (
     <div className={styles.participatedEvents}>
@@ -193,7 +157,7 @@ const Events = () => {
                 </thead>
 
                 <tbody>
-                  {events.map((event) => (
+                  {events?.map((event) => (
                     <tr key={event._id || event.id}>
                       <td
                         className={styles.mobilewidth}
@@ -221,33 +185,31 @@ const Events = () => {
                         </Link>
                       </td>
 
-                      {/* Certificate - only for USERS */}
-                      {authCtx.user.access === "USER" && (
-                        <td>
-                          {loadingCerts ? (
-                            <div>
-                              <MicroLoading />
-                            </div>
-                          ) : certMap[event.id] ? (
-                            <Link
-                              href={certMap[event.id]}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <button>
-                                View
-                              </button>
-                            </Link>
-                          ) : (
-                            <button
-                              disabled
-                              style={{ opacity: 0.5 }}
-                            >
-                              Not Issued
+                      {/* Certificate - accessible to all who have one */}
+                      <td>
+                        {loadingCerts ? (
+                          <div>
+                            <MicroLoading />
+                          </div>
+                        ) : certMap?.[event.id] ? (
+                          <Link
+                            href={`/verify/certificate?id=${certMap[event.id].certificateId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <button>
+                              View
                             </button>
-                          )}
-                        </td>
-                      )}
+                          </Link>
+                        ) : (
+                          <button
+                            disabled
+                            style={{ opacity: 0.5 }}
+                          >
+                            Not Issued
+                          </button>
+                        )}
+                      </td>
 
                       {/* Analytics - only for admins and specific roles */}
                       {(analyticsAccessRoles.includes(authCtx.user.access) ||

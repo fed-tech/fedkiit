@@ -14,6 +14,9 @@ const Events = () => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [certificates, setCertificates] = useState([]);
+  const [certMap, setCertMap] = useState({});
+  const [loadingCerts, setLoadingCerts] = useState(true);
   const viewPath = "/profile/Events";
   const SendCertificatePath = "/profile/events/SendCertificate";
   const analyticsPath = "/profile/events/Analytics";
@@ -33,23 +36,26 @@ const Events = () => {
   ];
 
   useEffect(() => {
+    if (!authCtx.token) return;
+
     const fetchEventsData = async () => {
       try {
-        const response = await api.get("/api/form/getAllForms");
-        const userEvents = authCtx.user.regForm;
+        const [response, attendanceResponse] = await Promise.all([
+          api.get("/api/form/getAllForms"),
+          fetch("/api/attendance/myAttendance", {
+            headers: { Authorization: `Bearer ${authCtx.token}` }
+          })
+        ]);
+
+        const attendanceData = await attendanceResponse.json();
+        const attendedIds = attendanceData.success ? attendanceData.formIds : [];
 
         if (response.status === 200) {
           let fetchedEvents = response.data.events;
-          if (authCtx?.user?.access !== "USER") {
-            // Set events for non-users
-            setEvents(sortEventsByDate(fetchedEvents));
-          } else {
-            // Filter and then sort events for users
-            const filteredEvents = fetchedEvents.filter((event) =>
-              userEvents.includes(event.id)
-            );
-            setEvents(sortEventsByDate(filteredEvents));
-          }
+          const filteredEvents = fetchedEvents.filter((event) =>
+            attendedIds.includes(event.id)
+          );
+          setEvents(sortEventsByDate(filteredEvents));
         } else {
           console.error("Error fetching event data:", response.data.message);
           setError({
@@ -62,26 +68,44 @@ const Events = () => {
           message:
             "Sorry for the inconvenience, we are having issues fetching your Events",
         });
-        console.error("Error fetching team members:", error);
-
-        // const userEvents = authCtx.user.regForm;
-        // // using local JSON data
-        // let localEvents = eventsData.events;
-        // if (authCtx?.user?.access !== "USER") {
-        //   setEvents(sortEventsByDate(localEvents));
-        // } else {
-        //   const filteredEvents = localEvents.filter((event) =>
-             userEvents.includes(event._id)
-        //   );
-        //   setEvents(sortEventsByDate(filteredEvents));
-        // }
+        console.error("Error fetching events:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchEventsData();
-  }, [authCtx?.user?.email]);
+  }, [authCtx.token]);
+
+  useEffect(() => {
+    if (!authCtx.token) return;
+
+    async function fetchCertificates() {
+      try {
+        const res = await fetch("/api/certificate/myCertificates", {
+          headers: {
+            Authorization: `Bearer ${authCtx.token}`
+          }
+        });
+
+        const data = await res.json();
+        setCertificates(data);
+      } catch (err) {
+        console.error("Error fetching certificates:", err);
+      }
+    }
+
+    fetchCertificates();
+  }, [authCtx.token]);
+
+  useEffect(() => {
+    const map = {};
+    certificates?.forEach(cert => {
+      map[cert.formId] = cert;
+    });
+    setCertMap(map);
+    setLoadingCerts(false);
+  }, [certificates]);
 
   const sortEventsByDate = (events) => {
     return events.sort((a, b) => new Date(b.info.eventDate) - new Date(a.info.eventDate));
@@ -136,8 +160,8 @@ const Events = () => {
                 </thead>
 
                 <tbody>
-                  {events.map((event) => (
-                    <tr key={event._id}>
+                  {events?.filter(e => certMap?.[e.id])?.map((event) => (
+                    <tr key={event._id || event.id}>
                       <td className={styles.mobilewidth} style={{fontWeight:"500",paddingRight:"10px"}}>
                         {event.info.eventTitle}
                       </td>
