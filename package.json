@@ -42,7 +42,7 @@
     "lucide-react": "^1.27.0",
     "moment": "^2.31.0",
     "nanoid": "^6.0.0",
-    "next": "16.3.8",
+    "next": "16.4.1",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "19.2.4",
@@ -69,7 +69,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "overrides": {
     "postcss": "^8.5.25",
